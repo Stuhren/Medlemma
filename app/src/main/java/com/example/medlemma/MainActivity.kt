@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medlemma.ui.theme.MedlemmaTheme
 
 import com.example.medlemma.View.SignUpScreen
+import com.example.medlemma.View.SignInScreen
 import com.example.medlemma.ViewModel.SignupViewModel
 import androidx.lifecycle.ViewModelProvider
 
@@ -35,6 +36,11 @@ class MainActivity : ComponentActivity() {
                         composable("signUp") {
                             SignUpScreen(navController) { email, pass, confirmPass ->
                                 viewModel.signUp(email, pass, confirmPass)
+                            }
+                        }
+                        composable("signIn") {
+                            SignInScreen(navController) { email, pass ->
+
                             }
                         }
                         // Add other composables/screens as needed.
