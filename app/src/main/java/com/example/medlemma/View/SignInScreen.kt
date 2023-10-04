@@ -39,7 +39,7 @@ fun SignInScreen(navController: NavController, signUpAction: (email: String, pas
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
 
-        Text(text = "Sign Up", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(text = "Sign in", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.height(24.dp))
 
         val emailState = rememberSaveable { mutableStateOf("") }
