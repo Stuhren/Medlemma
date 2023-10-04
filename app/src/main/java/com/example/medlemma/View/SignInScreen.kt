@@ -20,17 +20,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.medlemma.ViewModel.SigninViewModel
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, signUpAction: (email: String, pass: String) -> Unit) {
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -39,7 +40,7 @@ fun SignInScreen(navController: NavController, signUpAction: (email: String, pas
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
 
-        Text(text = "Sign Up", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(text = "Sign In", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.height(24.dp))
 
         val emailState = rememberSaveable { mutableStateOf("") }
@@ -69,7 +70,7 @@ fun SignInScreen(navController: NavController, signUpAction: (email: String, pas
         Button(onClick = {
             signUpAction(emailState.value, passwordState.value)
         }) {
-            Text("Sign Up")
+            Text("Sign In")
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -79,4 +80,5 @@ fun SignInScreen(navController: NavController, signUpAction: (email: String, pas
             Text("Dont have an account? Sign up")
         }
     }
+
 }
