@@ -10,13 +10,16 @@ import com.google.firebase.ktx.Firebase
 
 private val auth: FirebaseAuth = Firebase.auth
 
-
-
 class SigninViewModel : ViewModel() {
 
+    // Live stores the error message
     val errorMessage = MutableLiveData<String?>()
+
     fun signIn(email: String, pass: String) {
+
+        // Attempt sign in
         auth.signInWithEmailAndPassword(email, pass)
+            // Sign in successful
             .addOnSuccessListener { userCredential ->
                 errorMessage.value = null // clear any previous errors
                 // Signed in
@@ -24,7 +27,9 @@ class SigninViewModel : ViewModel() {
                 println("SIGNEND IN")
                 // ...
             }
+            // Sign in failed
             .addOnFailureListener { exception ->
+                // Converts the error message to a user friendly message and sets the errorMessage.value to this
                 when (exception) {
                     is FirebaseAuthException -> {
                         println("SignInError: Error Code -> ${exception.errorCode}")

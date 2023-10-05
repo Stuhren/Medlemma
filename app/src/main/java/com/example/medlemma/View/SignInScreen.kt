@@ -35,6 +35,7 @@ import androidx.compose.runtime.livedata.observeAsState
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signInAction: (email: String, pass: String) -> Unit) {
+    // Retrieves the login error message from the SigninViewModel
     val errorMessage by viewModel.errorMessage.observeAsState()
 
     Column(
@@ -70,7 +71,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-
+        // Calls the SignIn function in SigninViewmodel
         Button(onClick = {
             signInAction(emailState.value, passwordState.value)
         }) {
@@ -79,7 +80,6 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
         // Display the error message, if present
         if (!errorMessage.isNullOrEmpty()) {
             Text(text = errorMessage ?: "", color = Color.Red, modifier = Modifier)
-
         }
 
         Spacer(modifier = Modifier.height(24.dp))
