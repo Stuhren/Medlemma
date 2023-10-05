@@ -42,8 +42,8 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable("signIn") {
-                            SignInScreen(navController) { email, pass ->
-                                signInViewModel.signIn(email,pass)
+                            SignInScreen(navController, signInViewModel) { email, pass ->
+                                signInViewModel.signIn(email, pass)
                             }
                         }
                         // Add other composables/screens as needed.
