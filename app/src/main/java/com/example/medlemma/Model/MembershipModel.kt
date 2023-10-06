@@ -32,4 +32,25 @@ object FirebaseRepository {
             continuation.invokeOnCancellation { database.removeEventListener(listener) }
         }
     }
+
+    suspend fun getCompanyLogo(): List<String> {
+        return suspendCancellableCoroutine { continuation ->
+            val listener = object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val companyLogos = mutableListOf<String>()
+                    dataSnapshot.children.forEach {
+                        val companyLogo = it.child("companyLogo").value.toString()
+                        companyLogos.add(companyLogo)
+                    }
+                    continuation.resume(companyLogos)
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    continuation.resumeWithException(databaseError.toException())
+                }
+            }
+            database.addListenerForSingleValueEvent(listener)
+            continuation.invokeOnCancellation { database.removeEventListener(listener) }
+        }
+    }
 }

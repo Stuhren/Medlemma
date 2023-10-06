@@ -1,50 +1,64 @@
 package com.example.medlemma.View
 
-import androidx.compose.runtime.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-
+import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberImagePainter
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
 
 @Composable
-fun MyMemberships(myMembershipsViewModel: MyMembershipsViewModel) {
-    val categoriesLiveData: LiveData<List<String>> = myMembershipsViewModel.fetchCategories()
-    val categories by categoriesLiveData.observeAsState(initial = emptyList())
+fun MyMemberships() {
+    // Get a reference to the ViewModel
+    val viewModel: MyMembershipsViewModel = viewModel()
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        GreetingText(message = "MY MEMBERSHIPS", from = categories.joinToString(", "))
-    }
-}
+    // Observe data from the ViewModel
+    val categories by viewModel.fetchCategories().observeAsState(initial = emptyList())
+    val logos by viewModel.fetchLogos().observeAsState(initial = emptyList())
 
-@Composable
-private fun GreetingText(message: String, from: String, modifier: Modifier = Modifier) {
+    // The main composable
     Column(
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
-            text = message,
+            text = "MY MEMBERSHIPS",
             fontSize = 100.sp,
             lineHeight = 116.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         Text(
-            text = "Categories: $from",
+            text = "Categories: ${categories.joinToString(", ")}",
             fontSize = 36.sp,
-            modifier = Modifier
-                .padding(16.dp)
-                .align(alignment = Alignment.End)
+            modifier = Modifier.padding(16.dp).align(alignment = Alignment.End)
         )
+
+        // Display logos
+        logos.forEach { logoUrl ->
+            Image(
+                painter = rememberImagePainter(data = logoUrl),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(150.dp)
+                    .clip(shape = MaterialTheme.shapes.medium)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(8.dp)
+            )
+        }
     }
 }
