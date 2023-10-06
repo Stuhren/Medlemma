@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
+
                         // Add other composables/screens as needed.
                     }
                 }

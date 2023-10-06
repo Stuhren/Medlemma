@@ -10,9 +10,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DefaultColorScheme = lightColorScheme(
+
+    // Default state button and top bar background
     primary = LightGray,
+
+    // This color is used for secondary elements in your app, such as secondary buttons and text
     secondary = RegularFontColor,
-    tertiary = HeadlineFontColor
+
+    tertiary = RedTest,
 
     /* You can override other default colors here, like:
     background = Color(0xFFFFFBFE),
