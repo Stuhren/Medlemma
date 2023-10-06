@@ -63,7 +63,9 @@ dependencies {
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.3")
     implementation ("androidx.navigation:navigation-compose:2.7.3")
     implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
-    implementation("androidx.appcompat:appcompat:1.6.1") // Replace x.x.x with the version you're using
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.compose.runtime:runtime-livedata:<compose_version>")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

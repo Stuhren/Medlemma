@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-val auth: FirebaseAuth = Firebase.auth
+private val auth: FirebaseAuth = Firebase.auth
 
 
 

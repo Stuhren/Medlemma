@@ -15,15 +15,18 @@ import com.example.medlemma.ui.theme.MedlemmaTheme
 import com.example.medlemma.View.SignUpScreen
 import com.example.medlemma.View.SignInScreen
 import com.example.medlemma.ViewModel.SignupViewModel
+import com.example.medlemma.ViewModel.SigninViewModel
 import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel: SignupViewModel
+    private lateinit var signUpViewModel: SignupViewModel
+    private lateinit var signInViewModel: SigninViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
+        signUpViewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
+        signInViewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
 
         setContent {
             MedlemmaTheme {
@@ -35,12 +38,12 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController, startDestination = "signUp") {
                         composable("signUp") {
                             SignUpScreen(navController) { email, pass, confirmPass ->
-                                viewModel.signUp(email, pass, confirmPass)
+                                signUpViewModel.signUp(email, pass, confirmPass)
                             }
                         }
                         composable("signIn") {
-                            SignInScreen(navController) { email, pass ->
-
+                            SignInScreen(navController, signInViewModel) { email, pass ->
+                                signInViewModel.signIn(email, pass)
                             }
                         }
                         // Add other composables/screens as needed.
