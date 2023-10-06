@@ -3,6 +3,7 @@ package com.example.medlemma.ViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
 import com.google.firebase.auth.FirebaseAuth
@@ -18,7 +19,7 @@ class SignupViewModel : ViewModel() {
     // LiveData for holding the error message
     val signupErrorMessage = MutableLiveData<String?>()
 
-    fun signUp(email: String, pass: String, confirmPass: String) {
+    fun signUp(navController: NavController, email: String, pass: String, confirmPass: String) {
         if(email.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
             signupErrorMessage.value = "All fields are required."
             return
@@ -28,7 +29,7 @@ class SignupViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     signupErrorMessage.value = null // clear any previous errors
                     val user = task.result?.user
-                    println("SIGNUP")
+                    navController.navigate("myMemberships")
                 } else {
                     val exception = task.exception
                     when (exception) {

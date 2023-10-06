@@ -2,6 +2,7 @@ package com.example.medlemma.ViewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
@@ -15,7 +16,7 @@ class SigninViewModel : ViewModel() {
     // Live stores the error message
     val errorMessage = MutableLiveData<String?>()
 
-    fun signIn(email: String, pass: String) {
+    fun signIn(navController: NavController, email: String, pass: String) {
         if(email.isEmpty() || pass.isEmpty()) {
             errorMessage.value = "All fields are required."
             return
@@ -27,7 +28,7 @@ class SigninViewModel : ViewModel() {
                 errorMessage.value = null // clear any previous errors
                 // Signed in
                 val user = userCredential.user
-                println("SIGNEND IN")
+                navController.navigate("myMemberships")
                 // ...
             }
             // Sign in failed

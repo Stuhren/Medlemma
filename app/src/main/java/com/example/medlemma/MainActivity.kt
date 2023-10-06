@@ -17,6 +17,9 @@ import com.example.medlemma.View.SignInScreen
 import com.example.medlemma.ViewModel.SignupViewModel
 import com.example.medlemma.ViewModel.SigninViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.medlemma.View.AdminDashboard
+import com.example.medlemma.View.BrowseMemberships
+import com.example.medlemma.View.MyMemberships
 
 class MainActivity : ComponentActivity() {
     private lateinit var signUpViewModel: SignupViewModel
@@ -38,13 +41,22 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
                             SignInScreen(navController, signInViewModel) { email, pass ->
-                                signInViewModel.signIn(email, pass)
+                                signInViewModel.signIn(navController,email, pass)
                             }
                         }
                         composable("signUp") {
                             SignUpScreen(navController, signUpViewModel) { email, pass, confirmPass ->
-                                signUpViewModel.signUp(email, pass, confirmPass)
+                                signUpViewModel.signUp(navController, email, pass, confirmPass)
                             }
+                        }
+                        composable("adminDashboard") {
+                            AdminDashboard()
+                        }
+                        composable("browseMemberships") {
+                            BrowseMemberships()
+                        }
+                        composable("myMemberships") {
+                            MyMemberships()
                         }
 
 
