@@ -20,23 +20,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.medlemma.ViewModel.SigninViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signInAction: (email: String, pass: String) -> Unit) {
-    // Retrieves the login error message from the SigninViewModel
-    val errorMessage by viewModel.errorMessage.observeAsState()
+fun SignInScreen(navController: NavController, signUpAction: (email: String, pass: String) -> Unit) {
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -45,7 +39,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
     ) {
         val keyboardController = LocalSoftwareKeyboardController.current
 
-        Text(text = "Sign In", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(text = "Sign in", fontSize = 24.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
         Spacer(modifier = Modifier.height(24.dp))
 
         val emailState = rememberSaveable { mutableStateOf("") }
@@ -71,23 +65,18 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Calls the SignIn function in SigninViewmodel
+
         Button(onClick = {
-            signInAction(emailState.value, passwordState.value)
+            signUpAction(emailState.value, passwordState.value)
         }) {
-            Text("Sign In")
-        }
-        // Display the error message, if present
-        if (!errorMessage.isNullOrEmpty()) {
-            Text(text = errorMessage ?: "", color = Color.Red, modifier = Modifier)
+            Text("Sign Up")
         }
 
         Spacer(modifier = Modifier.height(24.dp))
         TextButton(onClick = {
             navController.navigate("signUp") // assuming this is the route name for SignIn screen
         }) {
-            Text("Don't have an account? Sign up")
+            Text("Dont have an account? Sign up")
         }
     }
-
 }
