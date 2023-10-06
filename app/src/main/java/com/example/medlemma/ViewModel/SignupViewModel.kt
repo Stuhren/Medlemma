@@ -19,6 +19,10 @@ class SignupViewModel : ViewModel() {
     val signupErrorMessage = MutableLiveData<String?>()
 
     fun signUp(email: String, pass: String, confirmPass: String) {
+        if(email.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
+            signupErrorMessage.value = "All fields are required."
+            return
+        }
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {

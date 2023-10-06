@@ -1,6 +1,7 @@
 package com.example.medlemma.View
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -68,7 +70,8 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signU
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
+            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -78,17 +81,27 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signU
         }) {
             Text("Sign Up")
         }
-        // Display the error message, if present
-        if (!errorMessage.isNullOrEmpty()) {
-            Text(text = errorMessage ?: "", color = Color.Red, modifier = Modifier)
-
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
         TextButton(onClick = {
             navController.navigate("signUp") // assuming this is the route name for SignIn screen
         }) {
             Text("Dont have an account? Sign up")
+        }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 40.dp), // Fills the entire available space
+        contentAlignment = Alignment.BottomCenter// Aligns content inside the box to the bottom
+    ){
+        if (!errorMessage.isNullOrEmpty()) {
+            Text(
+                text = errorMessage ?: "",
+                color = Color.Red,
+                modifier = Modifier.padding(8.dp)
+            )
         }
     }
 }

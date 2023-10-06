@@ -16,7 +16,10 @@ class SigninViewModel : ViewModel() {
     val errorMessage = MutableLiveData<String?>()
 
     fun signIn(email: String, pass: String) {
-
+        if(email.isEmpty() || pass.isEmpty()) {
+            errorMessage.value = "All fields are required."
+            return
+        }
         // Attempt sign in
         auth.signInWithEmailAndPassword(email, pass)
             // Sign in successful

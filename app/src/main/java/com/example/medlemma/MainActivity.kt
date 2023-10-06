@@ -35,17 +35,18 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavHost(navController, startDestination = "signUp") {
-                        composable("signUp") {
-                            SignUpScreen(navController, signUpViewModel) { email, pass, confirmPass ->
-                                signUpViewModel.signUp(email, pass, confirmPass)
-                            }
-                        }
+                    NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(email, pass)
                             }
                         }
+                        composable("signUp") {
+                            SignUpScreen(navController, signUpViewModel) { email, pass, confirmPass ->
+                                signUpViewModel.signUp(email, pass, confirmPass)
+                            }
+                        }
+
                         // Add other composables/screens as needed.
                     }
                 }

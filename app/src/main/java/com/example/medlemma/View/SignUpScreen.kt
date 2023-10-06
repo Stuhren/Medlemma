@@ -1,6 +1,7 @@
 package com.example.medlemma.View
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -36,10 +38,12 @@ import com.example.medlemma.ViewModel.SignupViewModel
 fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signUpAction: (email: String, pass: String, confirmPass: String) -> Unit) {
     val context = LocalContext.current
     // Observe the signup error message
-    val signupErrorMessage by viewModel.signupErrorMessage.observeAsState()
+    val errorMessage by viewModel.signupErrorMessage.observeAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -68,7 +72,8 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
+            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -78,7 +83,8 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
             label = { Text("Confirm Password") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -87,16 +93,27 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
         }) {
             Text("Sign Up")
         }
-        // Display the signup error message, if present
-        if (!signupErrorMessage.isNullOrEmpty()) {
-            Text(text = signupErrorMessage ?: "", color = Color.Red, modifier = Modifier)
-        }
+
 
         Spacer(modifier = Modifier.height(24.dp))
         TextButton(onClick = {
             navController.navigate("signIn") // assuming this is the route name for SignIn screen
         }) {
             Text("Already have an account? Sign In")
+        }
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 40.dp), // Fills the entire available space
+        contentAlignment = Alignment.BottomCenter// Aligns content inside the box to the bottom
+    ){
+        if (!errorMessage.isNullOrEmpty()) {
+            Text(
+                text = errorMessage ?: "",
+                color = Color.Red,
+                modifier = Modifier.padding(8.dp)
+            )
         }
     }
 }
