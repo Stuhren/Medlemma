@@ -15,7 +15,7 @@ private val DefaultColorScheme = lightColorScheme(
     primary = Blue,
 
     // This color is used for secondary elements in your app, such as secondary buttons and text
-    secondary = RegularFontColor,
+    secondary = SoftGray,
 
     tertiary = RedTest,
 
