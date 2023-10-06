@@ -109,7 +109,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     horizontalArrangement = Arrangement.Start // Align to the start
                 ) {
                     Image(painter = painterResource(id = R.drawable.icons8_google), contentDescription = "", modifier = Modifier.size(24.dp))
-                    Text("Sign up with Google", modifier = Modifier.padding(start = 5.dp))
+                    Text("Login with Google", modifier = Modifier.padding(start = 5.dp))
                 }
             }
 
@@ -125,7 +125,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     horizontalArrangement = Arrangement.Start // Align to the start
                 ) {
                     Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "")
-                    Text("Sign up with Facebook", modifier = Modifier.padding(start = 5.dp))
+                    Text("Login with Facebook", modifier = Modifier.padding(start = 5.dp))
                 }
             }
         }
