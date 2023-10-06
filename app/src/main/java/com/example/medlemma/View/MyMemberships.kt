@@ -1,21 +1,28 @@
 package com.example.medlemma.View
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LiveData
+
+import com.example.medlemma.ViewModel.MyMembershipsViewModel
 
 @Composable
-fun MyMemberships() {
+fun MyMemberships(myMembershipsViewModel: MyMembershipsViewModel) {
+    val categoriesLiveData: LiveData<List<String>> = myMembershipsViewModel.fetchCategories()
+    val categories by categoriesLiveData.observeAsState(initial = emptyList())
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        GreetingText(message = "MY MEMBERSHIPS", from = "")
+        GreetingText(message = "MY MEMBERSHIPS", from = categories.joinToString(", "))
     }
 }
 
@@ -33,7 +40,7 @@ private fun GreetingText(message: String, from: String, modifier: Modifier = Mod
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         Text(
-            text = from,
+            text = "Categories: $from",
             fontSize = 36.sp,
             modifier = Modifier
                 .padding(16.dp)

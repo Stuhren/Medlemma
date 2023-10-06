@@ -65,6 +65,11 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.runtime:runtime-livedata:<compose_version>")
+    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
 
 
     testImplementation("junit:junit:4.13.2")
