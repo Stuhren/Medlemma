@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = "signUp") {
                         composable("signUp") {
-                            SignUpScreen(navController) { email, pass, confirmPass ->
+                            SignUpScreen(navController, signUpViewModel) { email, pass, confirmPass ->
                                 signUpViewModel.signUp(email, pass, confirmPass)
                             }
                         }

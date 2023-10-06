@@ -15,22 +15,28 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.medlemma.ViewModel.SignupViewModel
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(navController: NavController, signUpAction: (email: String, pass: String, confirmPass: String) -> Unit) {
+fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signUpAction: (email: String, pass: String, confirmPass: String) -> Unit) {
     val context = LocalContext.current
+    // Observe the signup error message
+    val signupErrorMessage by viewModel.signupErrorMessage.observeAsState()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -80,6 +86,10 @@ fun SignUpScreen(navController: NavController, signUpAction: (email: String, pas
             signUpAction(emailState.value, passwordState.value, confirmPassState.value)
         }) {
             Text("Sign Up")
+        }
+        // Display the signup error message, if present
+        if (!signupErrorMessage.isNullOrEmpty()) {
+            Text(text = signupErrorMessage ?: "", color = Color.Red, modifier = Modifier)
         }
 
         Spacer(modifier = Modifier.height(24.dp))

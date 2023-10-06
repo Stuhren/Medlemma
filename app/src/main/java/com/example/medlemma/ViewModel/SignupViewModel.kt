@@ -1,5 +1,6 @@
 package com.example.medlemma.ViewModel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -14,20 +15,34 @@ private val auth: FirebaseAuth = Firebase.auth
 
 
 class SignupViewModel : ViewModel() {
+    // LiveData for holding the error message
+    val signupErrorMessage = MutableLiveData<String?>()
 
-    // Example function for signing up (replace with your logic)
     fun signUp(email: String, pass: String, confirmPass: String) {
         auth.createUserWithEmailAndPassword(email, pass)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Signed up
+                    signupErrorMessage.value = null // clear any previous errors
                     val user = task.result?.user
-                    // ...
+                    println("SIGNUP")
                 } else {
-                    // If sign up fails, display a message to the user.
-                    val errorCode = (task.exception as? FirebaseAuthException)?.errorCode
-                    val errorMessage = task.exception?.message
-                    // ...
+                    val exception = task.exception
+                    when (exception) {
+                        is FirebaseAuthException -> {
+                            println("SignUpError: Error Code -> ${exception.errorCode}")
+                            signupErrorMessage.value = when (exception.errorCode) {
+                                "ERROR_EMAIL_ALREADY_IN_USE" -> "Email already in use. Please try another."
+                                "ERROR_INVALID_EMAIL" -> "Please enter a valid email address."
+                                "ERROR_WEAK_PASSWORD" -> "Password is too weak. Please use a stronger password."
+                                // ... other FirebaseAuthException error codes
+                                else -> "An unexpected error occurred. Please try again."
+                            }
+                        }
+                        else -> {
+                            println("SignUpError: Exception of unknown type -> ${exception?.javaClass}")
+                            signupErrorMessage.value = "An unexpected error occurred. Please try again."
+                        }
+                    }
                 }
             }
     }
