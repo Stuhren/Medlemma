@@ -11,4 +11,9 @@ class MyMembershipsViewModel : ViewModel() {
         val data = FirebaseRepository.getCategories()
         emit(data)
     }
+    fun fetchLogos() = liveData(Dispatchers.IO) {
+        val data = FirebaseRepository.getCompanyLogo()
+        emit(data)
+    }
+
 }

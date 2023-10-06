@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
                             BrowseMemberships()
                         }
                         composable("myMemberships") {
-                            MyMemberships(myMembershipsViewModel)
+                            MyMemberships()
                         }
 
 
@@ -68,5 +68,5 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        }
     }
+}
