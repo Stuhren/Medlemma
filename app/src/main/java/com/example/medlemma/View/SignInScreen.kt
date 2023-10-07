@@ -156,9 +156,9 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     text = errorMessage ?: "",
                     color = Color.Red,
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
+                        .align(Alignment.CenterStart)
                         .padding(8.dp)
-                        .padding(bottom = 26.dp) // Ensure this is above the "Sign up" text.
+                        .padding(top = 40.dp) // Ensure this is above the "Sign up" text.
                 )
             }
         }
