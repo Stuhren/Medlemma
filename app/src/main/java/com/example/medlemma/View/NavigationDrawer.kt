@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medlemma.ViewModel.MenuItem
@@ -27,7 +29,10 @@ fun DrawerHeader() {
             .padding(vertical = 64.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Header", fontSize = 60.sp)
+        Text(
+            text = "Medlemma", fontSize = 50.sp,
+            textDecoration = TextDecoration.Underline
+            )
     }
 }
 

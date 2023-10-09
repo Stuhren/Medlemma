@@ -6,7 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,13 +32,13 @@ import com.example.medlemma.ViewModel.SigninViewModel
 import com.example.medlemma.ViewModel.SignupViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     private lateinit var signUpViewModel: SignupViewModel
     private lateinit var signInViewModel: SigninViewModel
     private lateinit var myMembershipsViewModel: MyMembershipsViewModel
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,9 +48,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
+
             MedlemmaTheme {
                 val scaffoldState = rememberScaffoldState()
                 val scope = rememberCoroutineScope()
+
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = {
@@ -60,26 +65,28 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     drawerContent = {
+                        // Use NavHostController to check the current route
                         DrawerHeader()
-                        DrawerBody(items = listOf(
-                            MenuItem(
-                                id = "myMemberships",
-                                title = "My Memberships",
-                                contentDescription = "My Memberships",
-                                icon = Icons.Default.Home
-                            ),
-                            MenuItem(
-                                id = "browseMemberships",
-                                title = "Browse Memberships",
-                                contentDescription = "Browse Memberships",
-                                icon = Icons.Default.Home
-                            )
-                        ), onItemClick = {
-                            navController.navigate(it.id)
-                        })
+                        DrawerBody(
+                            items = listOf(
+                                MenuItem(
+                                    id = "myMemberships",
+                                    title = "My Memberships",
+                                    contentDescription = "My Memberships",
+                                    icon = Icons.Default.CheckCircle
+                                ),
+                                MenuItem(
+                                    id = "browseMemberships",
+                                    title = "Browse Memberships",
+                                    contentDescription = "Browse Memberships",
+                                    icon = Icons.Default.Search
+                                )
+                            ), onItemClick = {
+                                navController.navigate(it.id)
+                            }
+                        )
                     }
                 ) {
-                    // Place your NavHost inside the Scaffold content
                     NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
                             SignInScreen(navController, signInViewModel) { email, pass ->
@@ -87,7 +94,10 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable("signUp") {
-                            SignUpScreen(navController, signUpViewModel) { email, pass, confirmPass ->
+                            SignUpScreen(
+                                navController,
+                                signUpViewModel
+                            ) { email, pass, confirmPass ->
                                 signUpViewModel.signUp(navController, email, pass, confirmPass)
                             }
                         }

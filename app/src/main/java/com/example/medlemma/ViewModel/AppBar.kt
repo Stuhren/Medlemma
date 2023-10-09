@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.example.medlemma.R
 
@@ -27,7 +28,7 @@ fun AppBar(
         TopAppBar(
             title = {
                 Text(text = "Medlemma",
-                    style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onPrimary)
+                    style = MaterialTheme.typography.titleLarge.copy(color = Color.Black)
                     )
             },
             navigationIcon = {
