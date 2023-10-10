@@ -13,4 +13,4 @@ val RedTest = Color(0xFFFF0000)
 
 //buttons
 val ButtonColor = Color(0xFF353736) // Slightly darker button color
-val ButtonGreen = Color(0xFF7CFC00)
+val ButtonGreen = Color(0xFF7CFC00) //green button color
