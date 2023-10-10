@@ -1,5 +1,7 @@
 package com.example.medlemma.View
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +14,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -24,13 +25,15 @@ import androidx.navigation.NavController
 import com.example.medlemma.R
 import com.example.medlemma.ViewModel.SigninViewModel
 import com.example.medlemma.ui.theme.*
+import androidx.compose.ui.platform.LocalContext
+import com.example.medlemma.ui.theme.CustomShapes
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signInAction: (email: String, pass: String) -> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val errorMessage by viewModel.errorMessage.observeAsState()
-
+    val view = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +57,8 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                 label = { Text("Email") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
+                keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
+                shape = CustomShapes.large
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -68,6 +72,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     value = passwordState.value,
                     onValueChange = { passwordState.value = it },
                     label = { Text("Password") },
+                    shape = CustomShapes.large,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
@@ -77,21 +82,23 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                             Modifier.clickable(onClick = { /* Navigate to forgot password screen or perform other actions */ }),
                             contentAlignment = Alignment.CenterEnd
                         ) {
-                            Text(
-                                text = "Forgot?",
-                                style = MaterialTheme.typography.bodyLarge.copy(color = SoftGray),
-                                modifier = Modifier.padding(end = 8.dp) // Adjust as needed
-                            )
+                            TextButton(onClick = { Toast.makeText(view, "Forgot Password", Toast.LENGTH_SHORT).show() }) {
+                                Text(
+                                    text = "Forgot?",
+                                    style = MaterialTheme.typography.bodyLarge.copy(color = SoftGray),
+                                    modifier = Modifier.padding(end = 8.dp) // Adjust as needed
+                                )
+                            }
                         }
                     }
                 )
-
             }
 
+            Spacer(modifier = Modifier.height(70.dp))
 
-            Spacer(modifier = Modifier.height(26.dp))
-
-            Button(modifier = Modifier.align(Alignment.End), onClick = {
+            Button(modifier = Modifier.width(220.dp),
+                contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp),
+                onClick = {
                 signInAction(emailState.value, passwordState.value)
             }) {
                 Text("LOGIN")
@@ -101,30 +108,36 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
 
 
             TextButton(
-                onClick = { /*TODO*/ },
+                modifier = Modifier.width(220.dp),
+                onClick = { Toast.makeText(view, "Login with Google", Toast.LENGTH_SHORT).show()},
                 contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start // Align to the start
+                    modifier = Modifier.padding(end = 15.dp)
+                    //horizontalArrangement = Arrangement.Start // Align to the start
                 ) {
-                    Image(painter = painterResource(id = R.drawable.icons8_google), contentDescription = "", modifier = Modifier.size(24.dp))
-                    Text("Login with Google", modifier = Modifier.padding(start = 5.dp))
+                    Image(painter = painterResource(id = R.drawable.icons8_google),
+                        contentDescription = "",
+                        modifier = Modifier.size(24.dp))
+                    Text("Login with Google",
+                        modifier = Modifier.padding(start = 5.dp)
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
 
             TextButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.padding(start = 15.dp),
+                modifier = Modifier.width(220.dp),
+                onClick = { Toast.makeText(view, "Login with Facebook", Toast.LENGTH_SHORT).show() },
                 contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start // Align to the start
+                    //horizontalArrangement = Arrangement.Start // Align to the start
                 ) {
-                    Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "")
+                    Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "", modifier = Modifier.size(24.dp))
                     Text("Login with Facebook", modifier = Modifier.padding(start = 5.dp))
                 }
             }
@@ -156,7 +169,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     text = errorMessage ?: "",
                     color = Color.Red,
                     modifier = Modifier
-                        .align(Alignment.CenterStart)
+                        .align(Alignment.Center)
                         .padding(8.dp)
                         .padding(top = 40.dp) // Ensure this is above the "Sign up" text.
                 )

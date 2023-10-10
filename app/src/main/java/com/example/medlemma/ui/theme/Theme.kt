@@ -1,12 +1,15 @@
 package com.example.medlemma.ui.theme
 
 import android.app.Activity
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val DefaultColorScheme = lightColorScheme(
@@ -30,6 +33,12 @@ private val DefaultColorScheme = lightColorScheme(
     */
 )
 
+val CustomShapes = Shapes(
+    small = RoundedCornerShape(10.dp), // Adjust the radius as needed
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(40.dp)
+)
+
 @Composable
 fun MedlemmaTheme(
     content: @Composable () -> Unit
@@ -46,6 +55,7 @@ fun MedlemmaTheme(
     MaterialTheme(
         colorScheme = DefaultColorScheme,
         typography = Typography,
-        content = content
+        content = content,
+        shapes = CustomShapes
     )
 }
