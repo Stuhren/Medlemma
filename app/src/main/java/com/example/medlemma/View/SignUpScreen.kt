@@ -1,5 +1,6 @@
 package com.example.medlemma.View
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,18 +50,14 @@ import androidx.navigation.NavController
 import com.example.medlemma.R
 import com.example.medlemma.ViewModel.SignupViewModel
 import com.example.medlemma.ui.theme.Blue
+import com.example.medlemma.ui.theme.CustomShapes
 
-val customShape = Shapes(
-    small = RoundedCornerShape(10.dp), // Adjust the radius as needed
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(40.dp)
-)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signUpAction: (email: String, pass: String, confirmPass: String) -> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val errorMessage by viewModel.signupErrorMessage.observeAsState()
-
+    val view = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +83,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
-                shape = customShape.large
+                shape = CustomShapes.large
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -98,7 +95,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
                 visualTransformation = PasswordVisualTransformation(),
-                shape = customShape.large
+                shape = CustomShapes.large
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -110,9 +107,9 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
                 visualTransformation = PasswordVisualTransformation(),
-                shape = customShape.large
+                shape = CustomShapes.large
             )
-            Spacer(modifier = Modifier.height(26.dp))
+            Spacer(modifier = Modifier.height(80.dp))
 
             Button(
                 modifier = Modifier.width(220.dp),
@@ -123,34 +120,39 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                 Text("Sign Up")
             }
 
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
 
-            Button(
-                onClick = { /*TODO*/ },
+            TextButton(
+                onClick = { Toast.makeText(view, "Sign up with google", Toast.LENGTH_SHORT).show() },
+                modifier = Modifier.width(220.dp),
+                contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(end = 15.dp)
+                ) {
+                    Image(painter = painterResource(id = R.drawable.icons8_google),
+                        contentDescription = "",
+                        modifier = Modifier.size(24.dp))
+                    Text("Sign up with Google", modifier = Modifier.padding(start = 5.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            TextButton(
+                onClick = { Toast.makeText(view, "Sign up with Facebook", Toast.LENGTH_SHORT).show() },
                 modifier = Modifier.width(220.dp),
                 contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(id = R.drawable.icons8_google), contentDescription = "", modifier = Modifier.size(24.dp))
-                    Text("  Sign up with Google", color = Color.White)
+                    Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "", modifier = Modifier.size(24.dp))
+                    Text("Sign up with Facebook", modifier = Modifier.padding(start = 5.dp))
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier.width(220.dp),
-                contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "")
-                    Text("  Sign up with Facebook", color = Color.White)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
         }
 
@@ -163,7 +165,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
             ) {
                 Text("Already have an account? ")
 
-                val signInText = "Sign In"
+                val signInText = "Login"
                 val signInString = AnnotatedString(signInText)
 
                 ClickableText(
@@ -182,7 +184,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(8.dp)
-                        .padding(bottom = 220.dp) // Ensure this is above the "Sign In" text.
+                        .padding(bottom = 250.dp) // Ensure this is above the "Sign In" text.
                 )
             }
         }
