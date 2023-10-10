@@ -41,11 +41,12 @@ fun MyMemberships() {
     val data by viewModel.fetchAllData().observeAsState(initial = emptyList())
     val view = LocalContext.current
     val categories = data.map { it.category }
-    val logos = data.map { it.companyLogo }
+    val id = data.map { it.id }
 
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
+    var selectedId by remember {mutableStateOf(id.firstOrNull())}
 
     // The main composable
     LazyColumn(
@@ -81,14 +82,14 @@ fun MyMemberships() {
                         Text(text = "Alla")
                     }
 
-                    categories.forEach { category ->
+                    data.forEach { item ->
                         DropdownMenuItem(
                             onClick = {
-                                selectedCategory = category
+                                selectedCategory = item.category
                                 expanded = false
                             }
                         ) {
-                            Text(text = category)
+                            Text(text = item.category)
                         }
                     }
                 }
@@ -109,18 +110,18 @@ fun MyMemberships() {
                         .fillMaxSize()
                         .clickable {
                             showDialog = true
-                            selectedCategory = item.category
+                            selectedId = item.id
                         }
                         .clip(shape = CustomShapes.medium)
                 ) {
-                    if (showDialog && selectedCategory == item.category) {
+                    if (showDialog && selectedId == item.id) {
                         SimpleDialog(
                             Category = item.category,
                             logo = item.companyLogo,
                             Name = item.companyName
                         ) {
                             showDialog = false // Close the dialog when needed
-                            selectedCategory = null // Reset the selected item
+                            selectedId = null // Reset the selected item
                         }
                     }
 
