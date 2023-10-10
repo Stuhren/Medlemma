@@ -8,6 +8,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -87,6 +88,12 @@ class MainActivity : ComponentActivity() {
                                     title = "Admin Dashboard",
                                     contentDescription = "Admin Dashboard",
                                     icon = Icons.Default.Edit
+                                ),
+                                MenuItem(
+                                    id = "signOut",
+                                    title = "Sign Out",
+                                    contentDescription = "Sign Out",
+                                    icon = Icons.Default.ExitToApp
                                 )
                             ), onItemClick = {
                                 navController.navigate(it.id)
@@ -116,6 +123,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("myMemberships") {
                             MyMemberships()
+                        }
+                        composable("signOut") {
+                            signInViewModel.signOut()
+                            SignInScreen(navController, signInViewModel) { email, pass ->
+                                signInViewModel.signIn(navController, email, pass)
+                            }
                         }
                     }
                 }

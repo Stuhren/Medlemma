@@ -58,4 +58,9 @@ class SigninViewModel : ViewModel() {
                 }
             }
     }
+
+    fun signOut(){
+        val firebaseAuth = FirebaseAuth.getInstance()
+        firebaseAuth.signOut()
+    }
 }
