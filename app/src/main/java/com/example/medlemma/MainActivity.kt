@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
                             }
                         )
                     },
+                    drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
                     drawerContent = {
                         // Use NavHostController to check the current route
                         DrawerHeader()
@@ -97,7 +98,8 @@ class MainActivity : ComponentActivity() {
                                 )
                             ), onItemClick = {
                                 navController.navigate(it.id)
-                            }
+                            },
+                            scaffoldState = scaffoldState
                         )
                     }
                 ) {
