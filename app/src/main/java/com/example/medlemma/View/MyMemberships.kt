@@ -23,25 +23,10 @@ import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ui.theme.SoftGray
 import com.example.medlemma.ui.theme.CustomShapes
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardActions.Companion.Default
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.medlemma.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +63,17 @@ fun MyMemberships() {
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
+
+                    // Add the "All" option first
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedCategory = "Alla"
+                            expanded = false
+                        }
+                    ) {
+                        Text(text = "Alla")
+                    }
+
                     categories.forEach { category ->
                         DropdownMenuItem(
                             onClick = {
