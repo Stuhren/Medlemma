@@ -1,5 +1,6 @@
 package com.example.medlemma.View
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +28,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
+import androidx.compose.ui.platform.LocalContext
+import com.example.medlemma.Model.FirebaseRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,10 +38,13 @@ fun MyMemberships() {
     val viewModel: MyMembershipsViewModel = viewModel()
 
     // Observe data from the ViewModel
-    val categories by viewModel.fetchCategories().observeAsState(initial = emptyList())
-    val logos by viewModel.fetchLogos().observeAsState(initial = emptyList())
+    val data by viewModel.fetchAllData().observeAsState(initial = emptyList())
+    val view = LocalContext.current
+    val categories = data.map { it.category }
+    val logos = data.map { it.companyLogo }
 
     var expanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
 
     // The main composable
@@ -56,6 +62,7 @@ fun MyMemberships() {
                     onClick = { expanded = true }
                 ) {
                     Text(text = selectedCategory ?: "Category")
+
                     Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
                 }
 
@@ -90,9 +97,8 @@ fun MyMemberships() {
         }
 
 
-
         // Display logos in clickable cards with a soft gray background and border
-        items(logos) { logoUrl ->
+        items(data) { item ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -102,18 +108,32 @@ fun MyMemberships() {
                     modifier = Modifier
                         .fillMaxSize()
                         .clickable {
-                            // Handle card click here
-                            // You can navigate to a detailed view or perform other actions
+                            showDialog = true
                         }
                         .clip(shape = CustomShapes.medium)
                 ) {
+
+                    if (showDialog) {
+                        SimpleDialog(
+                            Category = item.category,
+                            logo = item.companyLogo,
+                            Name = item.companyName
+                        ) {
+                            showDialog = false // Close the dialog when needed
+                        }
+                    }
+
                     Card(
                         modifier = Modifier
                             .fillMaxSize()
-                            .border(4.dp, SoftGray, shape = CustomShapes.medium) // Add a border with SoftGray color
+                            .border(
+                                4.dp,
+                                SoftGray,
+                                shape = CustomShapes.medium
+                            ) // Add a border with SoftGray color
                     ) {
                         Image(
-                            painter = rememberImagePainter(data = logoUrl),
+                            painter = rememberImagePainter(data = item.companyLogo),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -126,6 +146,7 @@ fun MyMemberships() {
         }
     }
 }
+
 
 
 

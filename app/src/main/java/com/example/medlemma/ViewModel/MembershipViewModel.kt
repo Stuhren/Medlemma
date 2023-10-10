@@ -16,4 +16,10 @@ class MyMembershipsViewModel : ViewModel() {
         emit(data)
     }
 
+    fun fetchAllData() = liveData(Dispatchers.IO) {
+        val data = FirebaseRepository.getAllItems()
+        emit(data)
+    }
+
+
 }
