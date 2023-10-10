@@ -109,17 +109,18 @@ fun MyMemberships() {
                         .fillMaxSize()
                         .clickable {
                             showDialog = true
+                            selectedCategory = item.category
                         }
                         .clip(shape = CustomShapes.medium)
                 ) {
-
-                    if (showDialog) {
+                    if (showDialog && selectedCategory == item.category) {
                         SimpleDialog(
                             Category = item.category,
                             logo = item.companyLogo,
                             Name = item.companyName
                         ) {
                             showDialog = false // Close the dialog when needed
+                            selectedCategory = null // Reset the selected item
                         }
                     }
 
