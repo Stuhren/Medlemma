@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ui.theme.SoftGray
+import com.example.medlemma.ui.theme.CustomShapes
 
 @Composable
 fun MyMemberships() {
@@ -75,13 +77,12 @@ fun MyMemberships() {
                             // Handle card click here
                             // You can navigate to a detailed view or perform other actions
                         }
-                        .background(SoftGray) // Set the background color to SoftGray
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(shape = CustomShapes.medium)
                 ) {
                     Card(
                         modifier = Modifier
                             .fillMaxSize()
-                            .border(1.dp, SoftGray) // Add a border with SoftGray color
+                            .border(4.dp, SoftGray, shape = CustomShapes.medium) // Add a border with SoftGray color
                     ) {
                         Image(
                             painter = rememberImagePainter(data = logoUrl),
