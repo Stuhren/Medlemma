@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -80,6 +81,12 @@ class MainActivity : ComponentActivity() {
                                     title = "Browse Memberships",
                                     contentDescription = "Browse Memberships",
                                     icon = Icons.Default.Search
+                                ),
+                                MenuItem(
+                                    id = "adminDashboard",
+                                    title = "Admin Dashboard",
+                                    contentDescription = "Admin Dashboard",
+                                    icon = Icons.Default.Edit
                                 )
                             ), onItemClick = {
                                 navController.navigate(it.id)
