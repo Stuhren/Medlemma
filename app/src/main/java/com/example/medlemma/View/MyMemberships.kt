@@ -1,32 +1,34 @@
 package com.example.medlemma.View
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.TextButton
 import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ui.theme.SoftGray
+import com.example.medlemma.ui.theme.CustomShapes
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyMemberships() {
     // Get a reference to the ViewModel
@@ -36,30 +38,58 @@ fun MyMemberships() {
     val categories by viewModel.fetchCategories().observeAsState(initial = emptyList())
     val logos by viewModel.fetchLogos().observeAsState(initial = emptyList())
 
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
+
     // The main composable
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
     ) {
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "MY MEMBERSHIPS",
-                    fontSize = 36.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+
+                TextButton(
+                    onClick = { expanded = true }
+                ) {
+                    Text(text = selectedCategory ?: "Category")
+                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+
+                    // Add the "All" option first
+                    DropdownMenuItem(
+                        onClick = {
+                            selectedCategory = "Alla"
+                            expanded = false
+                        }
+                    ) {
+                        Text(text = "Alla")
+                    }
+
+                    categories.forEach { category ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedCategory = category
+                                expanded = false
+                            }
+                        ) {
+                            Text(text = category)
+                        }
+                    }
+                }
             }
-            Text(
-                text = "Categories: ${categories.joinToString(", ")}",
-                fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
         }
+
+
 
         // Display logos in clickable cards with a soft gray background and border
         items(logos) { logoUrl ->
@@ -75,13 +105,12 @@ fun MyMemberships() {
                             // Handle card click here
                             // You can navigate to a detailed view or perform other actions
                         }
-                        .background(SoftGray) // Set the background color to SoftGray
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(shape = CustomShapes.medium)
                 ) {
                     Card(
                         modifier = Modifier
                             .fillMaxSize()
-                            .border(1.dp, SoftGray) // Add a border with SoftGray color
+                            .border(4.dp, SoftGray, shape = CustomShapes.medium) // Add a border with SoftGray color
                     ) {
                         Image(
                             painter = rememberImagePainter(data = logoUrl),
