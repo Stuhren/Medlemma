@@ -25,24 +25,31 @@ import com.example.medlemma.ui.theme.SoftGray
 import com.example.medlemma.ui.theme.CustomShapes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
-import com.example.medlemma.Model.FirebaseRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyMemberships() {
+fun MyMemberships(email: String?) {
     // Get a reference to the ViewModel
     val viewModel: MyMembershipsViewModel = viewModel()
 
-    // Observe data from the ViewModel
-    val data by viewModel.fetchAllData().observeAsState(initial = emptyList())
     val view = LocalContext.current
-    val categories = data.map { it.category }
-    val id = data.map { it.id }
 
+    val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
+    val companies by viewModel.fetchAllCompanies().observeAsState(initial = emptyList())
+
+    val currentMember = members.find { it.email == email }
+
+// Access the user's current memberships
+    val currentMemberships = currentMember?.currentMemberships ?: emptyList()
+
+// Filter companies to show only those the user is a member of
+    val userCompanies = companies.filter { currentMemberships.contains(it.id) }
+
+    val categories = companies.map { it.category }
+    val id = companies.map { it.id }
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
@@ -63,7 +70,7 @@ fun MyMemberships() {
                     onClick = { expanded = true }
                 ) {
                     Text(text = selectedCategory ?: "Category")
-
+                    //Toast.makeText(view, email, Toast.LENGTH_SHORT).show()
                     Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
                 }
 
@@ -82,7 +89,7 @@ fun MyMemberships() {
                         Text(text = "Alla")
                     }
 
-                    data.forEach { item ->
+                    companies.forEach { item ->
                         DropdownMenuItem(
                             onClick = {
                                 selectedCategory = item.category
@@ -97,54 +104,57 @@ fun MyMemberships() {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-
         // Display logos in clickable cards with a soft gray background and border
-        items(data) { item ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable {
-                            showDialog = true
-                            selectedId = item.id
-                        }
-                        .clip(shape = CustomShapes.medium)
-                ) {
-                    if (showDialog && selectedId == item.id) {
-                        SimpleDialog(
-                            Category = item.category,
-                            logo = item.companyLogo,
-                            Name = item.companyName
-                        ) {
-                            showDialog = false // Close the dialog when needed
-                            selectedId = null // Reset the selected item
-                        }
-                    }
+        items(userCompanies) { item ->
 
-                    Card(
+                if(currentMemberships.contains(item.id))
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .border(
-                                4.dp,
-                                SoftGray,
-                                shape = CustomShapes.medium
-                            ) // Add a border with SoftGray color
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
                     ) {
-                        Image(
-                            painter = rememberImagePainter(data = item.companyLogo),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .height(225.dp) // Adjust the height as needed
-                        )
+                                .clickable {
+                                    showDialog = true
+                                    selectedId = item.id
+                                }
+                                .clip(shape = CustomShapes.medium)
+                        ) {
+                            if (showDialog && selectedId == item.id) {
+                                SimpleDialog(
+                                    Category = item.category,
+                                    logo = item.companyLogo,
+                                    Name = item.companyName
+                                ) {
+                                    showDialog = false // Close the dialog when needed
+                                    selectedId = null // Reset the selected item
+                                }
+                            }
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .border(
+                                        4.dp,
+                                        SoftGray,
+                                        shape = CustomShapes.medium
+                                    ) // Add a border with SoftGray color
+                            ) {
+                                Image(
+                                    painter = rememberImagePainter(data = item.companyLogo),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .height(225.dp) // Adjust the height as needed
+                                )
+                            }
+                        }
                     }
-                }
-            }
+
+
         }
     }
 }
