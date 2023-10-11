@@ -1,14 +1,14 @@
 package com.example.medlemma.View
 
 import androidx.compose.foundation.layout.*
-
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -20,6 +20,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medlemma.ui.theme.*
 import com.example.medlemma.ui.theme.RedTest
+import androidx.compose.material3.*
+import androidx.compose.material3.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
+import com.google.android.play.integrity.internal.x
 
 @Composable
 fun AdminDashboard() {
@@ -40,10 +49,17 @@ fun AdminDashboard() {
     }
 }
 
+enum class IconState {
+    NOT_COMPLETED, COMPLETED
+}
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun AddCompany(modifier: Modifier = Modifier) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    val iconState1 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
+    val iconState2 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
+
     Column(
         modifier = modifier.padding(start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.Top,
@@ -98,8 +114,42 @@ private fun AddCompany(modifier: Modifier = Modifier) {
         ) {
             Button(onClick = {
                 //addCompanyLogoAction(categoryState.value, nameState.value, registerurlState.value)
+                iconState1.value = IconState.COMPLETED
+            }) {
+                Text("Fetch Company ID")
+            }
+
+
+            when (iconState1.value) {
+                IconState.NOT_COMPLETED -> {
+                    CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 167.dp, yOffset = 10.dp)
+                }
+
+                IconState.COMPLETED -> {
+                    CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 167.dp, yOffset = 10.dp)
+                }
+            }
+        }
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = {
+                //addCompanyLogoAction(categoryState.value, nameState.value, registerurlState.value)
+                iconState2.value = IconState.COMPLETED
             }) {
                 Text("Upload Company Logo")
+            }
+
+            when (iconState2.value) {
+                IconState.NOT_COMPLETED -> {
+                    CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 32.dp, yOffset = 10.dp)
+                }
+                IconState.COMPLETED -> {
+                    CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 32.dp, yOffset = 10.dp)
+                }
             }
 
             Button(onClick = {
@@ -109,6 +159,16 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+@Composable
+private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp) {
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = color,
+        modifier = Modifier.size(30.dp) then  Modifier.offset(x = -xOffset, y = yOffset)
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -126,7 +186,7 @@ private fun RegisteredUsers(modifier: Modifier = Modifier) {
             fontSize = 22.sp,
             modifier = Modifier
                 .align(Alignment.Start)
-                .padding(top = 60.dp)
+
         )
 
         // SEARCH FIELD
