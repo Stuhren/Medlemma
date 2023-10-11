@@ -9,8 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -107,6 +105,8 @@ class MainActivity : ComponentActivity() {
                         composable("signIn") {
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(navController, email, pass)
+                                val route = "myMemberships?email=$email"
+                                navController.navigate(route)
                             }
                         }
                         composable("signUp") {
@@ -123,8 +123,10 @@ class MainActivity : ComponentActivity() {
                         composable("browseMemberships") {
                             BrowseMemberships()
                         }
-                        composable("myMemberships") {
-                            MyMemberships()
+                        composable("myMemberships?email={email}") { backStackEntry ->
+                            // Retrieve the email from the navigation arguments
+                            val email = backStackEntry.arguments?.getString("email")
+                            MyMemberships(email)
                         }
                         composable("signOut") {
                             signInViewModel.signOut()

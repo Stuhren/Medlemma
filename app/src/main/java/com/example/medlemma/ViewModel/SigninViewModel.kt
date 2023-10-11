@@ -1,5 +1,10 @@
 package com.example.medlemma.ViewModel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
@@ -28,7 +33,7 @@ class SigninViewModel : ViewModel() {
                 errorMessage.value = null // clear any previous errors
                 // Signed in
                 val user = userCredential.user
-                navController.navigate("myMemberships")
+                navController.navigate("myMemberships?email={email}")
                 // ...
             }
             // Sign in failed

@@ -25,25 +25,23 @@ import com.example.medlemma.ui.theme.SoftGray
 import com.example.medlemma.ui.theme.CustomShapes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
-import com.example.medlemma.Model.FirebaseRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyMemberships() {
+fun MyMemberships(email: String?) {
     // Get a reference to the ViewModel
     val viewModel: MyMembershipsViewModel = viewModel()
 
-    // Observe data from the ViewModel
+    val view = LocalContext.current
+
     val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
     val companies by viewModel.fetchAllCompanies().observeAsState(initial = emptyList())
-    val view = LocalContext.current
+
     val categories = companies.map { it.category }
     val id = companies.map { it.id }
-
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
@@ -64,7 +62,7 @@ fun MyMemberships() {
                     onClick = { expanded = true }
                 ) {
                     Text(text = selectedCategory ?: "Category")
-
+                    Toast.makeText(view, email, Toast.LENGTH_SHORT).show()
                     Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
                 }
 
@@ -146,6 +144,7 @@ fun MyMemberships() {
                     }
                 }
             }
+
         }
     }
 }
