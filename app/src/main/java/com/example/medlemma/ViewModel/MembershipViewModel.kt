@@ -18,11 +18,6 @@ class MyMembershipsViewModel : ViewModel() {
         emit(data)
     }
 
-    fun sendCurrentUser(email: String) = liveData(Dispatchers.IO) {
-        val emailSet = setOf(email)
-        emit(emailSet)
-    }
-
     /*
     fun fetchCategories() = liveData(Dispatchers.IO) {
         val data = FirebaseRepository.getCategories()

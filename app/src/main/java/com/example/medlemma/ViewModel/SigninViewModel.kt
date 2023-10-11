@@ -33,7 +33,7 @@ class SigninViewModel : ViewModel() {
                 errorMessage.value = null // clear any previous errors
                 // Signed in
                 val user = userCredential.user
-                navController.navigate("myMemberships?email={email}")
+                navController.navigate("myMemberships?email=$email")
                 // ...
             }
             // Sign in failed

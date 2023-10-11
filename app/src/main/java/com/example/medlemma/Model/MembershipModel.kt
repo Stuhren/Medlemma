@@ -3,8 +3,10 @@ package com.example.medlemma.Model
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -55,30 +57,28 @@ object FirebaseRepository {
     }
 
     suspend fun getAllMembers(): List<Member> {
-        return suspendCancellableCoroutine { continuation ->
-            val listener = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val allMembers = mutableListOf<Member>()
-                    dataSnapshot.children.forEach { memberSnapshot ->
-                        val uid = memberSnapshot.child("uid").value.toString()
-                        val email = memberSnapshot.child("email").value.toString()
-                        val currentMemberships = memberSnapshot.child("currentMemberships").value as List<String>
-                        val identificationURL = memberSnapshot.child("identificationURL").value.toString()
-                        val role = memberSnapshot.child("role").value.toString()
-                        val member = Member(uid, email, currentMemberships, identificationURL, role)
-                        allMembers.add(member)
-                    }
-                    continuation.resume(allMembers)
-                }
+        return try {
+            val dataSnapshot = database.child("members").get().await()
+            val allMembers = mutableListOf<Member>()
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    continuation.resumeWithException(databaseError.toException())
-                }
+            for (memberSnapshot in dataSnapshot.children) {
+                val uid = memberSnapshot.child("uid").getValue(String::class.java) ?: ""
+                val email = memberSnapshot.child("email").getValue(String::class.java) ?: ""
+                val currentMemberships = memberSnapshot.child("currentMemberships").getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+                val identificationURL = memberSnapshot.child("identificationURL").getValue(String::class.java) ?: ""
+                val role = memberSnapshot.child("role").getValue(String::class.java) ?: ""
+
+                val member = Member(uid, email, currentMemberships, identificationURL, role)
+                allMembers.add(member)
             }
-            database.child("members").addListenerForSingleValueEvent(listener)
-            continuation.invokeOnCancellation { database.removeEventListener(listener) }
+
+            allMembers
+        } catch (e: Exception) {
+            // Handle exceptions or return an empty list if needed
+            emptyList()
         }
     }
+
 
     /*
         suspend fun getCategories(): List<String> {

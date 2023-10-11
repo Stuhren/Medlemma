@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var signInViewModel: SigninViewModel
     private lateinit var myMembershipsViewModel: MyMembershipsViewModel
 
-    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -126,7 +126,9 @@ class MainActivity : ComponentActivity() {
                         composable("myMemberships?email={email}") { backStackEntry ->
                             // Retrieve the email from the navigation arguments
                             val email = backStackEntry.arguments?.getString("email")
-                            MyMemberships(email)
+
+                                MyMemberships(email)
+
                         }
                         composable("signOut") {
                             signInViewModel.signOut()

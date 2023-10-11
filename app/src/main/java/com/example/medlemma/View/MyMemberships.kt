@@ -40,6 +40,14 @@ fun MyMemberships(email: String?) {
     val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
     val companies by viewModel.fetchAllCompanies().observeAsState(initial = emptyList())
 
+    val currentMember = members.find { it.email == email }
+
+// Access the user's current memberships
+    val currentMemberships = currentMember?.currentMemberships ?: emptyList()
+
+// Filter companies to show only those the user is a member of
+    val userCompanies = companies.filter { currentMemberships.contains(it.id) }
+
     val categories = companies.map { it.category }
     val id = companies.map { it.id }
     var expanded by remember { mutableStateOf(false) }
@@ -62,7 +70,7 @@ fun MyMemberships(email: String?) {
                     onClick = { expanded = true }
                 ) {
                     Text(text = selectedCategory ?: "Category")
-                    Toast.makeText(view, email, Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(view, email, Toast.LENGTH_SHORT).show()
                     Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
                 }
 
@@ -96,54 +104,56 @@ fun MyMemberships(email: String?) {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-
         // Display logos in clickable cards with a soft gray background and border
-        items(companies) { item ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable {
-                            showDialog = true
-                            selectedId = item.id
-                        }
-                        .clip(shape = CustomShapes.medium)
-                ) {
-                    if (showDialog && selectedId == item.id) {
-                        SimpleDialog(
-                            Category = item.category,
-                            logo = item.companyLogo,
-                            Name = item.companyName
-                        ) {
-                            showDialog = false // Close the dialog when needed
-                            selectedId = null // Reset the selected item
-                        }
-                    }
+        items(userCompanies) { item ->
 
-                    Card(
+                if(currentMemberships.contains(item.id))
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .border(
-                                4.dp,
-                                SoftGray,
-                                shape = CustomShapes.medium
-                            ) // Add a border with SoftGray color
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
                     ) {
-                        Image(
-                            painter = rememberImagePainter(data = item.companyLogo),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .height(225.dp) // Adjust the height as needed
-                        )
+                                .clickable {
+                                    showDialog = true
+                                    selectedId = item.id
+                                }
+                                .clip(shape = CustomShapes.medium)
+                        ) {
+                            if (showDialog && selectedId == item.id) {
+                                SimpleDialog(
+                                    Category = item.category,
+                                    logo = item.companyLogo,
+                                    Name = item.companyName
+                                ) {
+                                    showDialog = false // Close the dialog when needed
+                                    selectedId = null // Reset the selected item
+                                }
+                            }
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .border(
+                                        4.dp,
+                                        SoftGray,
+                                        shape = CustomShapes.medium
+                                    ) // Add a border with SoftGray color
+                            ) {
+                                Image(
+                                    painter = rememberImagePainter(data = item.companyLogo),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .height(225.dp) // Adjust the height as needed
+                                )
+                            }
+                        }
                     }
-                }
-            }
+
 
         }
     }
