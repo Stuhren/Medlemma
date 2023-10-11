@@ -7,6 +7,18 @@ import kotlinx.coroutines.Dispatchers
 
 class MyMembershipsViewModel : ViewModel() {
 
+
+    fun fetchAllMembers() = liveData(Dispatchers.IO) {
+        val data = FirebaseRepository.getAllMembers()
+        emit(data)
+    }
+
+    fun fetchAllCompanies() = liveData(Dispatchers.IO) {
+        val data = FirebaseRepository.getAllCompanies()
+        emit(data)
+    }
+
+    /*
     fun fetchCategories() = liveData(Dispatchers.IO) {
         val data = FirebaseRepository.getCategories()
         emit(data)
@@ -16,10 +28,6 @@ class MyMembershipsViewModel : ViewModel() {
         emit(data)
     }
 
-    fun fetchAllData() = liveData(Dispatchers.IO) {
-        val data = FirebaseRepository.getAllItems()
-        emit(data)
-    }
-
+     */
 
 }

@@ -38,10 +38,11 @@ fun MyMemberships() {
     val viewModel: MyMembershipsViewModel = viewModel()
 
     // Observe data from the ViewModel
-    val data by viewModel.fetchAllData().observeAsState(initial = emptyList())
+    val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
+    val companies by viewModel.fetchAllCompanies().observeAsState(initial = emptyList())
     val view = LocalContext.current
-    val categories = data.map { it.category }
-    val id = data.map { it.id }
+    val categories = companies.map { it.category }
+    val id = companies.map { it.id }
 
     var expanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
@@ -82,7 +83,7 @@ fun MyMemberships() {
                         Text(text = "Alla")
                     }
 
-                    data.forEach { item ->
+                    companies.forEach { item ->
                         DropdownMenuItem(
                             onClick = {
                                 selectedCategory = item.category
@@ -99,7 +100,7 @@ fun MyMemberships() {
 
 
         // Display logos in clickable cards with a soft gray background and border
-        items(data) { item ->
+        items(companies) { item ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
