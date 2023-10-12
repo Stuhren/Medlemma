@@ -46,6 +46,8 @@ class MainActivity : ComponentActivity() {
         signInViewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
         myMembershipsViewModel = ViewModelProvider(this).get(MyMembershipsViewModel::class.java)
 
+        var currentEmail: String = ""
+
         setContent {
             val navController = rememberNavController()
 
@@ -71,7 +73,7 @@ class MainActivity : ComponentActivity() {
                         DrawerBody(
                             items = listOf(
                                 MenuItem(
-                                    id = "myMemberships",
+                                    id = "myMemberships?email={email}",
                                     title = "My Memberships",
                                     contentDescription = "My Memberships",
                                     icon = Icons.Default.CheckCircle
@@ -94,8 +96,14 @@ class MainActivity : ComponentActivity() {
                                     contentDescription = "Sign Out",
                                     icon = Icons.Default.ExitToApp
                                 )
-                            ), onItemClick = {
-                                navController.navigate(it.id)
+                            ), onItemClick = { items ->
+                                //navController.navigate(it.id)
+                                if (items.id == "myMemberships?email={email}") { // Replace with the user's email
+                                    val route = "myMemberships?email=$currentEmail"
+                                    navController.navigate(route)
+                                } else {
+                                    navController.navigate(items.id)
+                                }
                             },
                             scaffoldState = scaffoldState
                         )
@@ -107,6 +115,7 @@ class MainActivity : ComponentActivity() {
                                 signInViewModel.signIn(navController, email, pass)
                                 val route = "myMemberships?email=$email"
                                 navController.navigate(route)
+                                currentEmail = email
                             }
                         }
                         composable("signUp") {
@@ -127,7 +136,7 @@ class MainActivity : ComponentActivity() {
                             // Retrieve the email from the navigation arguments
                             val email = backStackEntry.arguments?.getString("email")
 
-                                MyMemberships(email)
+                            MyMemberships(email)
 
                         }
                         composable("signOut") {
