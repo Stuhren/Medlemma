@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
+import com.example.medlemma.Model.getCompanyCountFromFirebase
 import com.google.android.play.integrity.internal.x
 
 @Composable
@@ -113,7 +114,13 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = {
-                //addCompanyLogoAction(categoryState.value, nameState.value, registerurlState.value)
+                getCompanyCountFromFirebase { companyCount ->
+                    if (companyCount != -1) {
+                        val newCompanyId = companyCount + 1
+                    } else {
+                        println("Failed to retrieve company ID from Firebase.")
+                    }
+                }
                 iconState1.value = IconState.COMPLETED
             }) {
                 Text("Fetch Company ID")
