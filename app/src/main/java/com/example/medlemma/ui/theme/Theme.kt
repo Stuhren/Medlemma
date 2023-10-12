@@ -15,10 +15,10 @@ import androidx.core.view.WindowCompat
 private val DefaultColorScheme = lightColorScheme(
 
     // Default state button and top bar background
-    primary = Blue,
+    primary = SoftGray,
 
     // This color is used for secondary elements in your app, such as secondary buttons and text
-    secondary = SoftGray,
+    secondary = Blue,
 
     tertiary = RedTest,
 

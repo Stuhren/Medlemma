@@ -3,8 +3,10 @@ package com.example.medlemma.ui.theme
 import androidx.compose.ui.graphics.Color
 
 //background
-val Blue = Color(0xFF00747C)
-val SoftGray = Color(0xFFA8A8A8)
+val Blue = Color(0xFF00747C) //test
+val SoftGray = Color(0xFFA6A6A6) //customer's wish
+val DarkGray = Color(0xFFA6A6A6) //customer's wish
+
 
 //font colors
 val RegularFontColor = Color(0xFF111010) // Regular font color (nearly black)

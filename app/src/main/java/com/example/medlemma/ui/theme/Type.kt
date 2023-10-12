@@ -8,14 +8,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import com.example.medlemma.R
 
-val BalsamiqSans = FontFamily(
-    Font(R.font.balsamiq_sans_regular) //
+val roboto = FontFamily(
+    Font(R.font.roboto_slab_regular) //
 )
 
 val Typography = Typography(
     // Define your custom text style using the Balsamiq Sans font
     bodyLarge = TextStyle(
-        fontFamily = BalsamiqSans,
+        fontFamily = roboto,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
