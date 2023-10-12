@@ -117,11 +117,11 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                 getCompanyCountFromFirebase { companyCount ->
                     if (companyCount != -1) {
                         val newCompanyId = companyCount + 1
+                        iconState1.value = IconState.COMPLETED
                     } else {
                         println("Failed to retrieve company ID from Firebase.")
                     }
                 }
-                iconState1.value = IconState.COMPLETED
             }) {
                 Text("Fetch Company ID")
             }
