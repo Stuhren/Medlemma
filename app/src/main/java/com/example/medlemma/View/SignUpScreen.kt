@@ -51,145 +51,149 @@ import com.example.medlemma.R
 import com.example.medlemma.ViewModel.SignupViewModel
 import com.example.medlemma.ui.theme.Blue
 import com.example.medlemma.ui.theme.CustomShapes
+import com.example.medlemma.ui.theme.MedlemmaTheme
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signUpAction: (email: String, pass: String, confirmPass: String) -> Unit) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val errorMessage by viewModel.signupErrorMessage.observeAsState()
-    val view = LocalContext.current
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+    MedlemmaTheme {
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val errorMessage by viewModel.signupErrorMessage.observeAsState()
+        val view = LocalContext.current
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Text(text = "Sign Up", fontSize = 34.sp, modifier = Modifier.align(Alignment.Start))
-            Text(text = "Please register to continue.", fontSize = 16.sp, modifier = Modifier.align(Alignment.Start))
-            Spacer(modifier = Modifier.height(24.dp))
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Sign Up", fontSize = 34.sp, modifier = Modifier.align(Alignment.Start))
+                Text(text = "Please register to continue.", fontSize = 16.sp, modifier = Modifier.align(Alignment.Start))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            val emailState = rememberSaveable { mutableStateOf("") }
-            val passwordState = rememberSaveable { mutableStateOf("") }
-            val confirmPassState = rememberSaveable { mutableStateOf("") }
+                val emailState = rememberSaveable { mutableStateOf("") }
+                val passwordState = rememberSaveable { mutableStateOf("") }
+                val confirmPassState = rememberSaveable { mutableStateOf("") }
 
-            OutlinedTextField(
-                value = emailState.value,
-                onValueChange = { emailState.value = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
-                shape = CustomShapes.large
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = emailState.value,
+                    onValueChange = { emailState.value = it },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
+                    shape = CustomShapes.large
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = passwordState.value,
-                onValueChange = { passwordState.value = it },
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
-                visualTransformation = PasswordVisualTransformation(),
-                shape = CustomShapes.large
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = passwordState.value,
+                    onValueChange = { passwordState.value = it },
+                    label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
+                    visualTransformation = PasswordVisualTransformation(),
+                    shape = CustomShapes.large
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = confirmPassState.value,
-                onValueChange = { confirmPassState.value = it },
-                label = { Text("Confirm Password") },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
-                visualTransformation = PasswordVisualTransformation(),
-                shape = CustomShapes.large
-            )
-            Spacer(modifier = Modifier.height(80.dp))
+                OutlinedTextField(
+                    value = confirmPassState.value,
+                    onValueChange = { confirmPassState.value = it },
+                    label = { Text("Confirm Password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
+                    visualTransformation = PasswordVisualTransformation(),
+                    shape = CustomShapes.large
+                )
+                Spacer(modifier = Modifier.height(80.dp))
 
-            Button(
-                modifier = Modifier.width(220.dp),
-                contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp),
-                onClick = {
-                signUpAction(emailState.value, passwordState.value, confirmPassState.value)
-            }) {
-                Text("Sign Up")
+                Button(
+                    modifier = Modifier.width(220.dp),
+                    contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp),
+                    onClick = {
+                        signUpAction(emailState.value, passwordState.value, confirmPassState.value)
+                    }) {
+                    Text("Sign Up")
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+
+                TextButton(
+                    onClick = { Toast.makeText(view, "Sign up with google", Toast.LENGTH_SHORT).show() },
+                    modifier = Modifier.width(220.dp),
+                    contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 15.dp)
+                    ) {
+                        Image(painter = painterResource(id = R.drawable.icons8_google),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp))
+                        Text("Sign up with Google", modifier = Modifier.padding(start = 5.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                TextButton(
+                    onClick = { Toast.makeText(view, "Sign up with Facebook", Toast.LENGTH_SHORT).show() },
+                    modifier = Modifier.width(220.dp),
+                    contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "", modifier = Modifier.size(24.dp))
+                        Text("Sign up with Facebook", modifier = Modifier.padding(start = 5.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-
-            TextButton(
-                onClick = { Toast.makeText(view, "Sign up with google", Toast.LENGTH_SHORT).show() },
-                modifier = Modifier.width(220.dp),
-                contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(end = 15.dp)
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Image(painter = painterResource(id = R.drawable.icons8_google),
-                        contentDescription = "",
-                        modifier = Modifier.size(24.dp))
-                    Text("Sign up with Google", modifier = Modifier.padding(start = 5.dp))
+                    Text("Already have an account? ")
+
+                    val signInText = "Login"
+                    val signInString = AnnotatedString(signInText)
+
+                    ClickableText(
+                        text = signInString,
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Blue),
+                        onClick = {
+                            navController.navigate("signIn")
+                        }
+                    )
+                }
+
+                if (!errorMessage.isNullOrEmpty()) {
+                    Text(
+                        text = errorMessage ?: "",
+                        color = Color.Red,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(8.dp)
+                            .padding(bottom = 250.dp) // Ensure this is above the "Sign In" text.
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            TextButton(
-                onClick = { Toast.makeText(view, "Sign up with Facebook", Toast.LENGTH_SHORT).show() },
-                modifier = Modifier.width(220.dp),
-                contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "", modifier = Modifier.size(24.dp))
-                    Text("Sign up with Facebook", modifier = Modifier.padding(start = 5.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(15.dp))
-
         }
-
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Row(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text("Already have an account? ")
-
-                val signInText = "Login"
-                val signInString = AnnotatedString(signInText)
-
-                ClickableText(
-                    text = signInString,
-                    style = MaterialTheme.typography.bodyLarge.copy(color = Blue),
-                    onClick = {
-                        navController.navigate("signIn")
-                    }
-                )
-            }
-
-            if (!errorMessage.isNullOrEmpty()) {
-                Text(
-                    text = errorMessage ?: "",
-                    color = Color.Red,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(8.dp)
-                        .padding(bottom = 250.dp) // Ensure this is above the "Sign In" text.
-                )
-            }
-        }
-
     }
+
 }
 
 @Composable

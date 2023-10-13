@@ -28,86 +28,90 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
+import com.example.medlemma.ui.theme.MedlemmaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyMemberships(email: String?) {
-    // Get a reference to the ViewModel
-    val viewModel: MyMembershipsViewModel = viewModel()
+    MedlemmaTheme {
 
-    val view = LocalContext.current
 
-    val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
-    val companies by viewModel.fetchAllCompanies().observeAsState(initial = emptyList())
+        // Get a reference to the ViewModel
+        val viewModel: MyMembershipsViewModel = viewModel()
 
-    val currentMember = members.find { it.email == email }
+        val view = LocalContext.current
+
+        val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
+        val companies by viewModel.fetchAllCompanies().observeAsState(initial = emptyList())
+
+        val currentMember = members.find { it.email == email }
 
 // Access the user's current memberships
-    val currentMemberships = currentMember?.currentMemberships ?: emptyList()
+        val currentMemberships = currentMember?.currentMemberships ?: emptyList()
 
 // Filter companies to show only those the user is a member of
-    val userCompanies = companies.filter { currentMemberships.contains(it.id) }
+        val userCompanies = companies.filter { currentMemberships.contains(it.id) }
 
-    val categories = companies.map { it.category }
-    val id = companies.map { it.id }
-    var expanded by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
-    var selectedId by remember {mutableStateOf(id.firstOrNull())}
+        val categories = companies.map { it.category }
+        val id = companies.map { it.id }
+        var expanded by remember { mutableStateOf(false) }
+        var showDialog by remember { mutableStateOf(false) }
+        var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
+        var selectedId by remember { mutableStateOf(id.firstOrNull()) }
 
-    // The main composable
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
-    ) {
-        item {
+        // The main composable
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp)
+        ) {
+            item {
 
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                TextButton(
-                    onClick = { expanded = true }
-                ) {
-                    Text(text = selectedCategory ?: "Category")
-                    //Toast.makeText(view, email, Toast.LENGTH_SHORT).show()
-                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
-                }
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
 
-                    // Add the "All" option first
-                    DropdownMenuItem(
-                        onClick = {
-                            selectedCategory = "Alla"
-                            expanded = false
-                        }
+                    TextButton(
+                        onClick = { expanded = true }
                     ) {
-                        Text(text = "Alla")
+                        Text(text = selectedCategory ?: "Category")
+                        //Toast.makeText(view, email, Toast.LENGTH_SHORT).show()
+                        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
                     }
 
-                    companies.forEach { item ->
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+
+                        // Add the "All" option first
                         DropdownMenuItem(
                             onClick = {
-                                selectedCategory = item.category
+                                selectedCategory = "Alla"
                                 expanded = false
                             }
                         ) {
-                            Text(text = item.category)
+                            Text(text = "Alla")
+                        }
+
+                        companies.forEach { item ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedCategory = item.category
+                                    expanded = false
+                                }
+                            ) {
+                                Text(text = item.category)
+                            }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
-            Spacer(modifier = Modifier.height(16.dp))
-        }
 
-        // Display logos in clickable cards with a soft gray background and border
-        items(userCompanies) { item ->
+            // Display logos in clickable cards with a soft gray background and border
+            items(userCompanies) { item ->
 
-                if(currentMemberships.contains(item.id))
+                if (currentMemberships.contains(item.id))
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -155,6 +159,7 @@ fun MyMemberships(email: String?) {
                     }
 
 
+            }
         }
     }
 }
