@@ -34,6 +34,8 @@ import com.example.medlemma.ViewModel.SigninViewModel
 import com.example.medlemma.ViewModel.SignupViewModel
 import kotlinx.coroutines.launch
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
     private lateinit var signUpViewModel: SignupViewModel
