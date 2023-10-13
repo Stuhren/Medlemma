@@ -7,6 +7,7 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
@@ -22,9 +23,9 @@ private val DefaultColorScheme = lightColorScheme(
 
     tertiary = RedTest,
 
-    /* You can override other default colors here, like:
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+
+    //background = Color.LightGray,
+    /*surface = Color(0xFFFFFBFE),
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
