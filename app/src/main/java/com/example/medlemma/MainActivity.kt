@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -45,6 +47,8 @@ class MainActivity : ComponentActivity() {
         signUpViewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
         signInViewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
         myMembershipsViewModel = ViewModelProvider(this).get(MyMembershipsViewModel::class.java)
+
+
 
         var currentEmail: String = ""
 
@@ -111,11 +115,18 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
+                            val currentEmailLogin = remember { mutableStateOf("") }
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(navController, email, pass)
-                                val route = "myMemberships?email=$email"
-                                navController.navigate(route)
-                                currentEmail = email
+                                currentEmailLogin.value = email
+                            }
+                            signInViewModel.errorMessage.observe(this@MainActivity) { error ->
+                                if (error == null) { // Check if login was successful based on no error message
+                                    currentEmail = currentEmailLogin.value
+                                    val route = "myMemberships?email=$currentEmail"
+                                    navController.navigate(route)
+
+                                }
                             }
                         }
                         composable("signUp") {
