@@ -1,5 +1,8 @@
 package com.example.medlemma.View
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -26,10 +29,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
+import com.example.medlemma.Model.addCompanyToFirebase
 import com.example.medlemma.Model.getCompanyCountFromFirebase
-import com.google.android.play.integrity.internal.x
+import com.example.medlemma.Model.uploadImageToFirebaseStorage
+import java.util.UUID
 
 @Composable
 fun AdminDashboard() {
@@ -60,6 +68,23 @@ private fun AddCompany(modifier: Modifier = Modifier) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val iconState1 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
     val iconState2 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
+    var downloadUrl by remember { mutableStateOf<String?>(null) }
+    var newCompanyId by remember { mutableStateOf<Int?>(null) }
+
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            val imageName = "your_image_name_${UUID.randomUUID()}.jpg" // Generate a unique name for the image
+            uploadImageToFirebaseStorage(uri, imageName) { imageUrl ->
+                if (imageUrl != null) {
+                    downloadUrl = imageUrl
+                    iconState2.value = IconState.COMPLETED
+                } else {
+                    // Handle the upload error
+                }
+            }
+        }
+    }
 
     Column(
         modifier = modifier.padding(start = 16.dp, end = 16.dp),
@@ -90,7 +115,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = nameState.value,
             onValueChange = { nameState.value = it },
-            label = { Text("Name") },
+            label = { Text("Company Name") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
@@ -116,7 +141,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             Button(onClick = {
                 getCompanyCountFromFirebase { companyCount ->
                     if (companyCount != -1) {
-                        val newCompanyId = companyCount + 1
+                        newCompanyId = companyCount + 1
                         iconState1.value = IconState.COMPLETED
                     } else {
                         println("Failed to retrieve company ID from Firebase.")
@@ -144,8 +169,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = {
-                //addCompanyLogoAction(categoryState.value, nameState.value, registerurlState.value)
-                iconState2.value = IconState.COMPLETED
+                launcher.launch("image/*")
             }) {
                 Text("Upload Company Logo")
             }
@@ -160,13 +184,30 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             }
 
             Button(onClick = {
-                //addCompanyAction(categoryState.value, nameState.value, registerurlState.value)
+                // Check if newCompanyId is not null before using it
+                newCompanyId?.let { companyId ->
+                    addCompanyToFirebase(
+                        categoryState.value,
+                        nameState.value,
+                        registerurlState.value,
+                        companyId,
+                        downloadUrl ?: ""
+                    ) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Added a company to the database", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Failed to add the company, handle the error
+                            Toast.makeText(context, "Failed to add to the database", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             }) {
                 Text("Add")
             }
         }
     }
 }
+
 
 @Composable
 private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp) {
