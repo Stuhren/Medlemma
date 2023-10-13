@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = {
+
                         AppBar(
                             onNavigationIconClick = {
                                 scope.launch {

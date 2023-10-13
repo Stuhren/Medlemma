@@ -1,12 +1,17 @@
 package com.example.medlemma.ui.theme
 
 import android.app.Activity
+import android.graphics.drawable.ColorDrawable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
@@ -14,24 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 private val DefaultColorScheme = lightColorScheme(
-
-    // Default state button and top bar background
-    primary = SoftGray,
-
-    // This color is used for secondary elements in your app, such as secondary buttons and text
+    primary = DarkGray,
     secondary = Blue,
-
     tertiary = RedTest,
-
-
-    //background = Color.LightGray,
-    /*surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    background = SoftGray
 )
 
 val CustomShapes = Shapes(
@@ -49,14 +40,17 @@ fun MedlemmaTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = DefaultColorScheme.primary.toArgb()
+            window.setBackgroundDrawable(ColorDrawable(RedTest.toArgb())) // Set window background color to SoftGray
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
 
-    MaterialTheme(
-        colorScheme = DefaultColorScheme,
-        typography = Typography,
-        content = content,
-        shapes = CustomShapes
-    )
+    Box(modifier = Modifier.background(DefaultColorScheme.background)) {
+        MaterialTheme(
+            colorScheme = DefaultColorScheme,
+            typography = Typography,
+            content = content,
+            shapes = CustomShapes
+        )
+    }
 }

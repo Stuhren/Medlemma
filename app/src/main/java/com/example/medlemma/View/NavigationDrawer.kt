@@ -28,20 +28,23 @@ import com.example.medlemma.ViewModel.MenuItem
 import kotlinx.coroutines.launch
 import com.example.medlemma.ui.theme.SoftGray
 import com.example.medlemma.ui.theme.CustomShapes
+import com.example.medlemma.ui.theme.MedlemmaTheme
 
 @Composable
 fun DrawerHeader() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 64.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Medlemma", fontSize = 50.sp,
-            textDecoration = TextDecoration.Underline
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 64.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Medlemma", fontSize = 50.sp,
+                textDecoration = TextDecoration.Underline
             )
-    }
+        }
+
 }
 
 @Composable
@@ -52,6 +55,8 @@ fun DrawerBody(
     onItemClick: (MenuItem) -> Unit,
     scaffoldState: ScaffoldState
 ) {
+
+
     val scope = rememberCoroutineScope()
     LazyColumn(modifier) {
         items(items) { item ->

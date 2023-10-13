@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 //background
 val Blue = Color(0xFF00747C) //test
-val SoftGray = Color(0xFFA6A6A6) //customer's wish
+val SoftGray = Color(0xFFD9D9D9) //customer's wish
 val DarkGray = Color(0xFFA6A6A6) //customer's wish
 
 
