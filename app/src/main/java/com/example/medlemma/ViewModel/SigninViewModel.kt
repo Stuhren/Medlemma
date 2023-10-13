@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
+
 
 private val auth: FirebaseAuth = Firebase.auth
 
@@ -67,5 +69,20 @@ class SigninViewModel : ViewModel() {
     fun signOut(){
         val firebaseAuth = FirebaseAuth.getInstance()
         firebaseAuth.signOut()
+    }
+
+    fun resetPassword(email:String){
+        val auth = Firebase.auth
+        println("RESET")
+
+        try {
+            auth.sendPasswordResetEmail(email)
+            // Password reset email sent!
+            // ..
+        } catch (e: Exception) {
+            val errorCode = e.localizedMessage
+            val errorMessage = e.message
+            // ..
+        }
     }
 }

@@ -73,6 +73,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
     implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation ("com.google.firebase:firebase-auth-ktx:22.1.2")
 
 
     testImplementation("junit:junit:4.13.2")

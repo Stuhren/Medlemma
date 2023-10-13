@@ -28,6 +28,7 @@ import com.example.medlemma.ui.theme.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.medlemma.ui.theme.CustomShapes
 
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signInAction: (email: String, pass: String) -> Unit) {
@@ -82,7 +83,14 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                             Modifier.clickable(onClick = { /* Navigate to forgot password screen or perform other actions */ }),
                             contentAlignment = Alignment.CenterEnd
                         ) {
-                            TextButton(onClick = { Toast.makeText(view, "Forgot Password", Toast.LENGTH_SHORT).show() }) {
+                            TextButton(onClick = {
+                                if(emailState.value.isNotEmpty()) {
+                                    viewModel.resetPassword(emailState.value)
+                                    Toast.makeText(view, "Password reset email sent to ${emailState.value}", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(view, "Please enter your email first.", Toast.LENGTH_SHORT).show()
+                                }
+                            }) {
                                 Text(
                                     text = "Forgot?",
                                     style = MaterialTheme.typography.bodyLarge.copy(color = SoftGray),
