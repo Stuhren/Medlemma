@@ -196,7 +196,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                         categoryState.value,
                         nameState.value,
                         registerurlState.value,
-                        companyId,
+                        companyId.toString(),
                         downloadUrl ?: ""
                     ) { success ->
                         if (success) {
@@ -292,7 +292,7 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             .clickable { /* Handle item click if needed */ }
     ) {
         Text(
-            text = "Company Name: ${company.name}",
+            text = "Company Name: ${company.companyName}",
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp)
         )

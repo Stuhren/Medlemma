@@ -5,12 +5,11 @@ import android.net.Uri
 import com.example.medlemma.ViewModel.Company
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 data class ViewCompany(
-    val name: String,
+    val companyName: String,
     val id: String,
     val category: String
 )
@@ -59,7 +58,7 @@ fun addCompanyToFirebase(
     category: String,
     companyName: String,
     registerUrl: String,
-    id: Int,
+    id: String,
     companyLogo: String,
     callback: (Boolean) -> Unit
 ) {
