@@ -3,6 +3,8 @@ package com.example.medlemma.View
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,7 +24,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.medlemma.ui.theme.*
-import com.example.medlemma.ui.theme.RedTest
 import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.foundation.verticalScroll
@@ -30,7 +31,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -42,6 +42,7 @@ import com.example.medlemma.Model.addCompanyToFirebase
 import com.example.medlemma.Model.getCompanyCountFromFirebase
 import com.example.medlemma.Model.uploadImageToFirebaseStorage
 import com.example.medlemma.ViewModel.CompanyViewModel
+import com.example.medlemma.ui.theme.Blue
 import java.util.UUID
 
 @Composable
@@ -195,7 +196,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                         categoryState.value,
                         nameState.value,
                         registerurlState.value,
-                        companyId,
+                        companyId.toString(),
                         downloadUrl ?: ""
                     ) { success ->
                         if (success) {
@@ -284,18 +285,54 @@ private fun CompanyList(viewModel: CompanyViewModel) {
 
 @Composable
 private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
-    Column {
-        Text(text = "Company Name: ${company.name}", fontSize = 16.sp)
-        Text(text = "Company ID: ${company.id}", fontSize = 16.sp)
-        Text(text = "Category: ${company.category}", fontSize = 16.sp)
-        Button(
-            onClick = onDelete,
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .background(Color.White)
+            .clickable { /* Handle item click if needed */ }
+    ) {
+        Text(
+            text = "Company Name: ${company.companyName}",
+            fontSize = 16.sp,
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(
+            text = "Company ID: ${company.id}",
+            fontSize = 16.sp,
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(
+            text = "Category: ${company.category}",
+            fontSize = 16.sp,
+            modifier = Modifier.padding(8.dp)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Delete")
+            Button(
+                onClick = onDelete,
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Delete")
+            }
+            Button(
+                onClick = { /* Handle update button click (no logic for now) */ },
+                colors = ButtonDefaults.buttonColors(Blue),
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Update")
+            }
         }
+        Divider(
+            color = Color.Gray,
+            thickness = 1.dp,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
+
 
 @Composable
 fun CompanyScreen(viewModel: CompanyViewModel) {
