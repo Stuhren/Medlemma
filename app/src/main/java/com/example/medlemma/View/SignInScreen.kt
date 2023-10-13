@@ -14,6 +14,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -26,6 +27,9 @@ import com.example.medlemma.R
 import com.example.medlemma.ViewModel.SigninViewModel
 import com.example.medlemma.ui.theme.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import com.example.medlemma.ui.theme.CustomShapes
 import com.example.medlemma.ui.theme.MedlemmaTheme
 
@@ -49,8 +53,14 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Login", fontSize = 34.sp, modifier = Modifier.align(Alignment.Start))
-                Text(text = "Please sign in to continue.", fontSize = 16.sp, modifier = Modifier.align(Alignment.Start))
+                val logo: Painter = painterResource(id = R.drawable.medlemmalogo)
+                Image(
+                    painter = logo,
+                    contentDescription = "Medlemma Logo",
+                    modifier = Modifier.size(150.dp)
+                )
+                Text(text = "Login", fontSize = 24.sp, modifier = Modifier.align(Alignment.Start))
+                Text(text = "Please sign in to continue.", fontSize = 14.sp, modifier = Modifier.align(Alignment.Start))
                 Spacer(modifier = Modifier.height(24.dp))
 
                 val emailState = rememberSaveable { mutableStateOf("") }
@@ -66,7 +76,6 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     shape = CustomShapes.large
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -106,7 +115,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     )
                 }
 
-                Spacer(modifier = Modifier.height(70.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Button(modifier = Modifier.width(220.dp),
                     contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp),
@@ -116,8 +125,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     Text("LOGIN")
                 }
 
-                Spacer(modifier = Modifier.height(64.dp))
-
+                Spacer(modifier = Modifier.height(10.dp))
 
                 TextButton(
                     modifier = Modifier.width(220.dp),
@@ -127,7 +135,6 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(end = 15.dp)
-                        //horizontalArrangement = Arrangement.Start // Align to the start
                     ) {
                         Image(painter = painterResource(id = R.drawable.icons8_google),
                             contentDescription = "",
@@ -147,7 +154,6 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        //horizontalArrangement = Arrangement.Start // Align to the start
                     ) {
                         Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "", modifier = Modifier.size(24.dp))
                         Text("Login with Facebook", modifier = Modifier.padding(start = 5.dp))
@@ -165,11 +171,20 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     Text("Don't have an account? ")
 
                     val signUpText = "Sign up"
-                    val signUpString = AnnotatedString(signUpText)
+                    val signUpString = AnnotatedString.Builder().apply {
+                        withStyle(
+                            style = SpanStyle(
+                                textDecoration = TextDecoration.Underline,
+                                color = blue2
+                            )
+                        ) {
+                            append(signUpText)
+                        }
+                    }.toAnnotatedString()
 
                     ClickableText(
                         text = signUpString,
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Blue),
+                        style = MaterialTheme.typography.bodyLarge,
                         onClick = {
                             navController.navigate("signUp")
                         }
@@ -183,12 +198,11 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                         modifier = Modifier
                             .align(Alignment.Center)
                             .padding(8.dp)
-                            .padding(top = 40.dp) // Ensure this is above the "Sign up" text.
+                            .padding(top = 40.dp)
                     )
                 }
             }
 
         }
     }
-
 }
