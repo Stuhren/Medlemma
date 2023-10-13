@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
+import com.example.medlemma.ui.theme.DarkGray
 import com.example.medlemma.ui.theme.MedlemmaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -142,7 +143,7 @@ fun MyMemberships(email: String?) {
                                     .fillMaxSize()
                                     .border(
                                         4.dp,
-                                        SoftGray,
+                                        DarkGray,
                                         shape = CustomShapes.medium
                                     ) // Add a border with SoftGray color
                             ) {
@@ -152,7 +153,7 @@ fun MyMemberships(email: String?) {
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .height(225.dp) // Adjust the height as needed
+                                        .height(220.dp) // Adjust the height as needed
                                 )
                             }
                         }
