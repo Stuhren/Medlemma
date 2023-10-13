@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.medlemma.Model.CompanyModel
 import com.example.medlemma.ui.theme.MedlemmaTheme
 import com.example.medlemma.View.SignUpScreen
 import com.example.medlemma.View.SignInScreen
@@ -28,6 +29,7 @@ import com.example.medlemma.View.DrawerBody
 import com.example.medlemma.View.DrawerHeader
 import com.example.medlemma.View.MyMemberships
 import com.example.medlemma.ViewModel.AppBar
+import com.example.medlemma.ViewModel.CompanyViewModel
 import com.example.medlemma.ViewModel.MenuItem
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ViewModel.SigninViewModel
@@ -39,6 +41,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var signUpViewModel: SignupViewModel
     private lateinit var signInViewModel: SigninViewModel
     private lateinit var myMembershipsViewModel: MyMembershipsViewModel
+    private val companyModel = CompanyModel()
+    private val companyViewModel = CompanyViewModel(companyModel)
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -138,7 +142,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable("adminDashboard") {
-                            AdminDashboard()
+                            AdminDashboard(companyViewModel = companyViewModel)
                         }
                         composable("browseMemberships") {
                             BrowseMemberships()

@@ -6,6 +6,14 @@ import com.example.medlemma.ViewModel.Company
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DatabaseReference
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+data class ViewCompany(
+    val name: String,
+    val id: String,
+    val category: String
+)
 
 fun getCompanyCountFromFirebase(callback: (Int) -> Unit) {
     val database = FirebaseDatabase.getInstance()
@@ -68,4 +76,37 @@ fun addCompanyToFirebase(
                 callback(false) // Failed to add the company
             }
         }
+}
+
+class CompanyModel {
+    private val _companyData = MutableStateFlow(emptyList<ViewCompany>())
+    val companyData = _companyData.asStateFlow()
+
+    private val database = FirebaseDatabase.getInstance()
+    private val reference = database.getReference("companies")
+
+    private val listener = object : ValueEventListener {
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val companies = mutableListOf<ViewCompany>()
+            for (childSnapshot in dataSnapshot.children) {
+                val name = childSnapshot.child("companyName").getValue(String::class.java) ?: ""
+                val id = childSnapshot.child("id").getValue(String::class.java) ?: ""
+                val category = childSnapshot.child("category").getValue(String::class.java) ?: ""
+                companies.add(ViewCompany(name, id, category))
+            }
+            _companyData.value = companies
+        }
+
+        override fun onCancelled(databaseError: DatabaseError) {
+            // Handle database error if needed
+        }
+    }
+
+    fun startListening() {
+        reference.addValueEventListener(listener)
+    }
+
+    fun stopListening() {
+        reference.removeEventListener(listener)
+    }
 }

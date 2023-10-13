@@ -29,18 +29,23 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
+import com.example.medlemma.Model.ViewCompany
 import com.example.medlemma.Model.addCompanyToFirebase
 import com.example.medlemma.Model.getCompanyCountFromFirebase
 import com.example.medlemma.Model.uploadImageToFirebaseStorage
+import com.example.medlemma.ViewModel.CompanyViewModel
 import java.util.UUID
 
 @Composable
-fun AdminDashboard() {
+fun AdminDashboard(companyViewModel: CompanyViewModel) {
     MedlemmaTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -52,7 +57,7 @@ fun AdminDashboard() {
                     .verticalScroll(rememberScrollState())
             ) {
                 AddCompany()
-                UpdateCompany()
+                CompanyScreen(viewModel = companyViewModel)
             }
         }
     }
@@ -221,21 +226,20 @@ private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-private fun UpdateCompany(modifier: Modifier = Modifier) {
+private fun CompanyView(viewModel: CompanyViewModel) {
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
-        modifier = modifier.padding(start = 16.dp, end = 16.dp),
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(30.dp))
+
         // REGISTERED USERS
         Text(
             text = "Update Companies",
             fontSize = 22.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-
+            modifier = Modifier.align(Alignment.Start)
         )
 
         // SEARCH FIELD
@@ -246,80 +250,68 @@ private fun UpdateCompany(modifier: Modifier = Modifier) {
             label = { Text("Search (Company Name)") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
-        )
+            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }))
+    }
+
+    Spacer(modifier = Modifier.height(30.dp))
+
+    Divider(color = Color.Gray, thickness = 1.dp)
+
+    Spacer(modifier = Modifier.height(20.dp))
+
+    // Display the list of companies
+    CompanyList(viewModel)
+
+    Spacer(modifier = Modifier.height(60.dp))
+}
 
 
-        // USERS
-        Spacer(modifier = Modifier.height(30.dp))
+@Composable
+private fun CompanyList(viewModel: CompanyViewModel) {
+    val companyData by viewModel.companyData.collectAsState()
 
-
-        Divider(color = Color.Gray, thickness = 1.dp)
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Company Name
-        Text(
-            text = "Company Name",
-            fontSize = 16.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-
-        Text(
-            text = "test99@gmail.com",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Company ID
-        Text(
-            text = "Company ID",
-            fontSize = 16.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-        Text(
-            text = "Oct 6, 2023",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // Category
-        Text(
-            text = "Category",
-            fontSize = 16.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-        Text(
-            text = "HpW4mwMRlSbYoFQXqwsTFaJFec32",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = {
-            //addCompanyAction(categoryState.value, nameState.value, registerurlState.value)
-        },
-            colors = ButtonDefaults.buttonColors(RedTest),
-            modifier = Modifier.align(Alignment.Start)) {
-            Text("Delete")
+    Column {
+        // Display company data and "Delete" button for each company
+        for (company in companyData) {
+            CompanyItem(company = company) {
+                // Implement the delete logic in the ViewModel
+                viewModel.deleteCompany(company)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Divider(color = Color.Gray, thickness = 1.dp)
-
-        Spacer(modifier = Modifier.height(60.dp))
     }
 }
+
+@Composable
+private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
+    Column {
+        Text(text = "Company Name: ${company.name}", fontSize = 16.sp)
+        Text(text = "Company ID: ${company.id}", fontSize = 16.sp)
+        Text(text = "Category: ${company.category}", fontSize = 16.sp)
+        Button(
+            onClick = onDelete,
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
+        ) {
+            Text("Delete")
+        }
+    }
+}
+
+@Composable
+fun CompanyScreen(viewModel: CompanyViewModel) {
+    val companyModel = viewModel.companyModel
+
+    DisposableEffect(Unit) {
+        // Start listening to the database when the Composable is first launched
+        companyModel.startListening()
+
+        onDispose {
+            // Stop listening when the Composable is disposed
+            companyModel.stopListening()
+        }
+    }
+
+    CompanyView(viewModel)
+}
+
 
