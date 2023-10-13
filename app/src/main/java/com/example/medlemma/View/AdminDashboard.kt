@@ -52,7 +52,7 @@ fun AdminDashboard() {
                     .verticalScroll(rememberScrollState())
             ) {
                 AddCompany()
-                RegisteredUsers()
+                UpdateCompany()
             }
         }
     }
@@ -221,16 +221,17 @@ private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-private fun RegisteredUsers(modifier: Modifier = Modifier) {
+private fun UpdateCompany(modifier: Modifier = Modifier) {
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = modifier.padding(start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(30.dp))
         // REGISTERED USERS
         Text(
-            text = "Registered Users",
+            text = "Update Companies",
             fontSize = 22.sp,
             modifier = Modifier
                 .align(Alignment.Start)
@@ -242,7 +243,7 @@ private fun RegisteredUsers(modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = searchState.value,
             onValueChange = { searchState.value = it },
-            label = { Text("Search (Email, Created, UID, Signed in)") },
+            label = { Text("Search (Company Name)") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
@@ -257,9 +258,9 @@ private fun RegisteredUsers(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // EMAIL
+        // Company Name
         Text(
-            text = "Email",
+            text = "Company Name",
             fontSize = 16.sp,
             modifier = Modifier
                 .align(Alignment.Start)
@@ -274,9 +275,9 @@ private fun RegisteredUsers(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // CREATED
+        // Company ID
         Text(
-            text = "Created",
+            text = "Company ID",
             fontSize = 16.sp,
             modifier = Modifier
                 .align(Alignment.Start)
@@ -290,9 +291,9 @@ private fun RegisteredUsers(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // USER UID
+        // Category
         Text(
-            text = "User UID",
+            text = "Category",
             fontSize = 16.sp,
             modifier = Modifier
                 .align(Alignment.Start)
@@ -304,23 +305,7 @@ private fun RegisteredUsers(modifier: Modifier = Modifier) {
                 .align(Alignment.Start)
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        // SIGNED IN
-        Text(
-            text = "Signed in",
-            fontSize = 16.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-        Text(
-            text = "Oct 6, 2023",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .align(Alignment.Start)
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(onClick = {
             //addCompanyAction(categoryState.value, nameState.value, registerurlState.value)
