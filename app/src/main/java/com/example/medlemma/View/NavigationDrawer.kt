@@ -1,12 +1,16 @@
 package com.example.medlemma.View
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,22 +33,28 @@ import kotlinx.coroutines.launch
 import com.example.medlemma.ui.theme.SoftGray
 import com.example.medlemma.ui.theme.CustomShapes
 import com.example.medlemma.ui.theme.MedlemmaTheme
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
+import com.example.medlemma.R
 
 @Composable
 fun DrawerHeader() {
-
+    MedlemmaTheme {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 64.dp),
+                .background(SoftGray)  // Set the background color
+                .padding(vertical = 44.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Medlemma", fontSize = 50.sp,
-                textDecoration = TextDecoration.Underline
+            val logo: Painter = painterResource(id = R.drawable.medlemmalogo)
+            Image(
+                painter = logo,
+                contentDescription = "Medlemma Logo",
+                modifier = Modifier.size(200.dp)
             )
         }
-
+    }
 }
 
 @Composable
@@ -55,38 +65,34 @@ fun DrawerBody(
     onItemClick: (MenuItem) -> Unit,
     scaffoldState: ScaffoldState
 ) {
-
-
-    val scope = rememberCoroutineScope()
-    LazyColumn(modifier) {
-        items(items) { item ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onItemClick(item)
-                        scope.launch {
-                            scaffoldState.drawerState.close()
-                        }
+    MedlemmaTheme {
+        Box(modifier = Modifier.fillMaxHeight().background(SoftGray)) {  // Fill the entire height and set the background color
+            val scope = rememberCoroutineScope()
+            LazyColumn(modifier) {
+                items(items) { item ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onItemClick(item)
+                                scope.launch {
+                                    scaffoldState.drawerState.close()
+                                }
+                            }
+                            .padding(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = item.contentDescription
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = item.title,
+                            style = itemTextStyle,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
-                    .padding(16.dp)
-                    .border(
-                        1.dp,
-                        Color.LightGray,
-                        shape = CustomShapes.small // Adjust the corner radius as needed
-                    )
-
-            ) {
-               Icon(
-                   imageVector = item.icon,
-                   contentDescription = item.contentDescription
-               )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = item.title,
-                    style = itemTextStyle,
-                    modifier = Modifier.weight(1f)
-                )
+                }
             }
         }
     }
