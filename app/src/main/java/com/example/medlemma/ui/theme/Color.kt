@@ -12,6 +12,7 @@ val DarkGray = Color(0xFFA6A6A6) //customer's wish
 val RegularFontColor = Color(0xFF111010) // Regular font color (nearly black)
 val HeadlineFontColor = Color(0xFF000000) // Headline font color (black)
 val RedTest = Color(0xFFFF0000)
+val blue2 = Color(0xFF007BFF)
 
 //buttons
 val ButtonColor = Color(0xFF353736) // Slightly darker button color
