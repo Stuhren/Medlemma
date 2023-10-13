@@ -106,7 +106,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                                 }) {
                                     Text(
                                         text = "Forgot?",
-                                        style = MaterialTheme.typography.bodyLarge.copy(color = DarkGray),
+                                        style = MaterialTheme.typography.bodyLarge.copy(color = RegularFontColor),
                                         modifier = Modifier.padding(end = 8.dp) // Adjust as needed
                                     )
                                 }

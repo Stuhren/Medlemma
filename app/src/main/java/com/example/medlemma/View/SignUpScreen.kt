@@ -42,14 +42,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.medlemma.R
 import com.example.medlemma.ViewModel.SignupViewModel
-import com.example.medlemma.ui.theme.Blue
+import com.example.medlemma.ui.theme.*
 import com.example.medlemma.ui.theme.CustomShapes
 import com.example.medlemma.ui.theme.MedlemmaTheme
 
@@ -111,7 +114,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                     visualTransformation = PasswordVisualTransformation(),
                     shape = CustomShapes.large
                 )
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(40.dp))
 
                 Button(
                     modifier = Modifier.width(220.dp),
@@ -123,7 +126,6 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
-
 
                 TextButton(
                     onClick = { Toast.makeText(view, "Sign up with google", Toast.LENGTH_SHORT).show() },
@@ -168,11 +170,20 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                     Text("Already have an account? ")
 
                     val signInText = "Login"
-                    val signInString = AnnotatedString(signInText)
+                    val signInString = AnnotatedString.Builder().apply {
+                        withStyle(
+                            style = SpanStyle(
+                                textDecoration = TextDecoration.Underline,
+                                color = blue2
+                            )
+                        ) {
+                            append(signInText)
+                        }
+                    }.toAnnotatedString()
 
                     ClickableText(
                         text = signInString,
-                        style = MaterialTheme.typography.bodyLarge.copy(color = Blue),
+                        style = MaterialTheme.typography.bodyLarge,
                         onClick = {
                             navController.navigate("signIn")
                         }
@@ -186,7 +197,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(8.dp)
-                            .padding(bottom = 250.dp) // Ensure this is above the "Sign In" text.
+                            .padding(bottom = 250.dp)
                     )
                 }
             }
@@ -194,26 +205,4 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
         }
     }
 
-}
-
-@Composable
-fun SocialMediaButton(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(imageVector = icon, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = text)
-        }
-    }
 }
