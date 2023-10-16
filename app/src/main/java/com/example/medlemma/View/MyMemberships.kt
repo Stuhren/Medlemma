@@ -1,6 +1,5 @@
 package com.example.medlemma.View
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
-import com.example.medlemma.ui.theme.SoftGray
 import com.example.medlemma.ui.theme.CustomShapes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -59,6 +57,7 @@ fun MyMemberships(email: String?) {
         var showDialog by remember { mutableStateOf(false) }
         var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
         var selectedId by remember { mutableStateOf(id.firstOrNull()) }
+        var QrCode = members.map{it.identificationURL}
 
         // The main composable
         LazyColumn(
@@ -128,13 +127,16 @@ fun MyMemberships(email: String?) {
                                 .clip(shape = CustomShapes.medium)
                         ) {
                             if (showDialog && selectedId == item.id) {
-                                SimpleDialog(
-                                    Category = item.category,
-                                    logo = item.companyLogo,
-                                    Name = item.companyName
-                                ) {
-                                    showDialog = false // Close the dialog when needed
-                                    selectedId = null // Reset the selected item
+                                if (currentMember != null) {
+                                    SimpleDialog(
+                                        Category = item.category,
+                                        Qr = currentMember.identificationURL,
+                                        logo = item.companyLogo,
+                                        Name = item.companyName,
+                                    ) {
+                                        showDialog = false // Close the dialog when needed
+                                        selectedId = null // Reset the selected item
+                                    }
                                 }
                             }
 
