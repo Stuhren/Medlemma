@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
+import com.example.medlemma.Model.FirebaseRepository
 import com.example.medlemma.ui.theme.DarkGray
 import com.example.medlemma.ui.theme.MedlemmaTheme
 
@@ -35,7 +36,6 @@ import com.example.medlemma.ui.theme.MedlemmaTheme
 @Composable
 fun MyMemberships(email: String?) {
     MedlemmaTheme {
-        // Get a reference to the ViewModel
         val viewModel: MyMembershipsViewModel = viewModel()
 
         val view = LocalContext.current
@@ -55,9 +55,21 @@ fun MyMemberships(email: String?) {
         val id = companies.map { it.id }
         var expanded by remember { mutableStateOf(false) }
         var showDialog by remember { mutableStateOf(false) }
-        var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
+        var selectedCategory by remember { mutableStateOf("Category") } // Set "Alla" as the initial category
         var selectedId by remember { mutableStateOf(id.firstOrNull()) }
         var QrCode = members.map { it.identificationURL }
+
+        var filteredCompanies = remember { mutableStateOf(userCompanies) }
+
+        DisposableEffect(selectedCategory) {
+            filteredCompanies.value = if (selectedCategory == "Alla" || selectedCategory == "Category") {
+                userCompanies
+            } else {
+                userCompanies.filter { it.category == selectedCategory }
+            }
+
+            onDispose {} // Dispose the effect
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
@@ -71,7 +83,7 @@ fun MyMemberships(email: String?) {
                         TextButton(
                             onClick = { expanded = true }
                         ) {
-                            Text(text = selectedCategory ?: "Category")
+                            Text(text = selectedCategory)
                             Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
                         }
 
@@ -106,7 +118,7 @@ fun MyMemberships(email: String?) {
 
                 // Display logos in clickable cards with a soft gray background and border
                 items(userCompanies) { item ->
-                    if (currentMemberships.contains(item.id))
+                    if (selectedCategory == "Alla" || selectedCategory == "Category" || item.category == selectedCategory) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -120,7 +132,6 @@ fun MyMemberships(email: String?) {
                                         selectedId = item.id
                                     }
                                     .clip(shape = CustomShapes.medium)
-
                             ) {
                                 Card(
                                     modifier = Modifier
@@ -142,7 +153,9 @@ fun MyMemberships(email: String?) {
                                 }
                             }
                         }
+                    }
                 }
+
             }
 
             // Overlay for darkening effect
