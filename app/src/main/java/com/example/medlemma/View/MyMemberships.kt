@@ -1,6 +1,7 @@
 package com.example.medlemma.View
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,8 +35,6 @@ import com.example.medlemma.ui.theme.MedlemmaTheme
 @Composable
 fun MyMemberships(email: String?) {
     MedlemmaTheme {
-
-
         // Get a reference to the ViewModel
         val viewModel: MyMembershipsViewModel = viewModel()
 
@@ -45,10 +45,10 @@ fun MyMemberships(email: String?) {
 
         val currentMember = members.find { it.email == email }
 
-// Access the user's current memberships
+        // Access the user's current memberships
         val currentMemberships = currentMember?.currentMemberships ?: emptyList()
 
-// Filter companies to show only those the user is a member of
+        // Filter companies to show only those the user is a member of
         val userCompanies = companies.filter { currentMemberships.contains(it.id) }
 
         val categories = companies.map { it.category }
@@ -57,117 +57,119 @@ fun MyMemberships(email: String?) {
         var showDialog by remember { mutableStateOf(false) }
         var selectedCategory by remember { mutableStateOf(categories.firstOrNull()) }
         var selectedId by remember { mutableStateOf(id.firstOrNull()) }
-        var QrCode = members.map{it.identificationURL}
+        var QrCode = members.map { it.identificationURL }
 
-        // The main composable
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            item {
-
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-
-                    TextButton(
-                        onClick = { expanded = true }
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp)
+            ) {
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(text = selectedCategory ?: "Category")
-                        //Toast.makeText(view, email, Toast.LENGTH_SHORT).show()
-                        Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-
-                        // Add the "All" option first
-                        DropdownMenuItem(
-                            onClick = {
-                                selectedCategory = "Alla"
-                                expanded = false
-                            }
+                        TextButton(
+                            onClick = { expanded = true }
                         ) {
-                            Text(text = "Alla")
+                            Text(text = selectedCategory ?: "Category")
+                            Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = null,)
                         }
 
-                        companies.forEach { item ->
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            // Add the "All" option first
                             DropdownMenuItem(
                                 onClick = {
-                                    selectedCategory = item.category
+                                    selectedCategory = "Alla"
                                     expanded = false
                                 }
                             ) {
-                                Text(text = item.category)
+                                Text(text = "Alla")
+                            }
+
+                            companies.forEach { item ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        selectedCategory = item.category
+                                        expanded = false
+                                    }
+                                ) {
+                                    Text(text = item.category)
+                                }
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
 
-            // Display logos in clickable cards with a soft gray background and border
-            items(userCompanies) { item ->
-
-                if (currentMemberships.contains(item.id))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                    ) {
+                // Display logos in clickable cards with a soft gray background and border
+                items(userCompanies) { item ->
+                    if (currentMemberships.contains(item.id))
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .clickable {
-                                    showDialog = true
-                                    selectedId = item.id
-                                }
-                                .clip(shape = CustomShapes.medium)
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
                         ) {
-                            if (showDialog && selectedId == item.id) {
-                                if (currentMember != null) {
-                                    SimpleDialog(
-                                        Category = item.category,
-                                        Qr = currentMember.identificationURL,
-                                        logo = item.companyLogo,
-                                        Name = item.companyName,
-                                    ) {
-                                        showDialog = false // Close the dialog when needed
-                                        selectedId = null // Reset the selected item
-                                    }
-                                }
-                            }
-
-                            Card(
+                            Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .border(
-                                        4.dp,
-                                        DarkGray,
-                                        shape = CustomShapes.medium
-                                    ) // Add a border with SoftGray color
+                                    .clickable {
+                                        showDialog = true
+                                        selectedId = item.id
+                                    }
+                                    .clip(shape = CustomShapes.medium)
+
                             ) {
-                                Image(
-                                    painter = rememberImagePainter(data = item.companyLogo),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
+                                Card(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .height(220.dp) // Adjust the height as needed
-                                )
+                                        .border(
+                                            4.dp,
+                                            DarkGray,
+                                            shape = CustomShapes.medium
+                                        ) // Add a border with SoftGray color
+                                ) {
+                                    Image(
+                                        painter = rememberImagePainter(data = item.companyLogo),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .height(220.dp) // Adjust the height as needed
+                                    )
+                                }
                             }
                         }
+                }
+            }
+
+            // Overlay for darkening effect
+            if (showDialog) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.6f)) // Adjust alpha for desired darkness
+                        .clickable { /* This could close the dialog if needed */ }
+                )
+            }
+
+            // Dialog outside the LazyColumn
+            if (showDialog && selectedId != null) {
+                val item = userCompanies.find { it.id == selectedId }
+                if (currentMember != null && item != null) {
+                    SimpleDialog(
+                        Category = item.category,
+                        Qr = currentMember.identificationURL,
+                        logo = item.companyLogo,
+                        Name = item.companyName,
+                    ) {
+                        showDialog = false // Close the dialog when needed
+                        selectedId = null // Reset the selected item
                     }
-
-
+                }
             }
         }
     }
 }
-
-
-
-
-

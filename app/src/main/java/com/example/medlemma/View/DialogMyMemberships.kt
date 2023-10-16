@@ -1,6 +1,7 @@
 package com.example.medlemma.View
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -21,16 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.rememberImagePainter
+import com.example.medlemma.ui.theme.SoftGray
+ // Replace with the actual Softgray color value
 
 @Composable
 fun SimpleDialog(
     Category: String,
     logo: String,
     Name: String,
-    Qr : String,
+    Qr: String,
     onDismiss: () -> Unit
 ) {
-
     Dialog(
         onDismissRequest = { onDismiss() },
         properties = DialogProperties(
@@ -38,61 +40,56 @@ fun SimpleDialog(
             dismissOnClickOutside = true
         )
     ) {
-        Card(modifier = Modifier
+        Card(
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-            ) {
-                Text(
-                    text = Name,
-                    //style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Text(
-                    text = Category,
-                    //style = MaterialTheme.typography.h6,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Image(
-                    painter = rememberImagePainter(data = logo),
-                    contentDescription = null,
+            Box(modifier = Modifier.background(SoftGray)) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(shape = RoundedCornerShape(16.dp)), // Add this line to clip the image with rounded corners
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                Image(
-                    painter = rememberImagePainter(data = Qr),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(120.dp)
-                        .align(alignment = CenterHorizontally)
-                        .clip(shape = RoundedCornerShape(16.dp)), // Add this line to clip the image with rounded corners
-                    contentScale = ContentScale.Crop
-                )
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Button(
-                    onClick = {
-                        // Handle button click
-                        onDismiss()
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                        .padding(10.dp)
                 ) {
-                    Text(text = "Close")
+                    Text(
+                        text = Name,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Text(
+                        text = Category,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Image(
+                        painter = rememberImagePainter(data = logo),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(shape = RoundedCornerShape(16.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Image(
+                        painter = rememberImagePainter(data = Qr),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .align(alignment = CenterHorizontally)
+                            .clip(shape = RoundedCornerShape(16.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Button(
+                        onClick = {
+                            onDismiss()
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = "Close")
+                    }
                 }
             }
-
         }
-
     }
 }
