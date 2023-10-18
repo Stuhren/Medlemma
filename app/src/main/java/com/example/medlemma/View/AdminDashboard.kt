@@ -306,6 +306,16 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp)
         )
+        Text(
+            text = "Register Url: ${company.registerUrl}", // Display the Register Url
+            fontSize = 16.sp,
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(
+            text = "Company Logo: ${company.companyLogo}", // Display the Company Logo
+            fontSize = 16.sp,
+            modifier = Modifier.padding(8.dp)
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween

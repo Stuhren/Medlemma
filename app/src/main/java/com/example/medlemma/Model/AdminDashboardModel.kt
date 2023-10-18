@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.asStateFlow
 data class ViewCompany(
     val companyName: String,
     val id: String,
-    val category: String
+    val category: String,
+    val registerUrl: String,
+    val companyLogo: String
 )
 
 fun getCompanyCountFromFirebase(callback: (Int) -> Unit) {
@@ -91,7 +93,9 @@ class CompanyModel {
                 val name = childSnapshot.child("companyName").getValue(String::class.java) ?: ""
                 val id = childSnapshot.child("id").getValue(String::class.java) ?: ""
                 val category = childSnapshot.child("category").getValue(String::class.java) ?: ""
-                companies.add(ViewCompany(name, id, category))
+                val registerUrl = childSnapshot.child("registerUrl").getValue(String::class.java) ?: ""
+                val companyLogo = childSnapshot.child("companyLogo").getValue(String::class.java) ?: ""
+                companies.add(ViewCompany(name, id, category, registerUrl, companyLogo))
             }
             _companyData.value = companies
         }
