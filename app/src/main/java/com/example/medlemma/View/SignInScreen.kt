@@ -77,6 +77,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
                     shape = CustomShapes.large
+
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -120,7 +121,8 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Button(modifier = Modifier.width(220.dp),
+                Button(
+                    modifier = Modifier.width(220.dp),
                     contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp),
                     onClick = {
                         signInAction(emailState.value, passwordState.value)
@@ -140,10 +142,10 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                         modifier = Modifier.padding(end = 15.dp)
                     ) {
                         Image(painter = painterResource(id = R.drawable.icons8_google),
-                            contentDescription = "",
+                            contentDescription = "LoginGoogle",
                             modifier = Modifier.size(24.dp))
                         Text("Login with Google",
-                            modifier = Modifier.padding(start = 5.dp)
+                            modifier = Modifier.padding(start = 5.dp),
                         )
                     }
                 }
@@ -158,7 +160,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "", modifier = Modifier.size(24.dp))
+                        Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "LoginFacebook", modifier = Modifier.size(24.dp))
                         Text("Login with Facebook", modifier = Modifier.padding(start = 5.dp))
                     }
                 }
