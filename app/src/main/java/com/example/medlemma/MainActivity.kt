@@ -12,12 +12,15 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.medlemma.Model.CompanyModel
 import com.example.medlemma.ui.theme.MedlemmaTheme
@@ -54,8 +57,6 @@ class MainActivity : ComponentActivity() {
         signInViewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
         myMembershipsViewModel = ViewModelProvider(this).get(MyMembershipsViewModel::class.java)
 
-
-
         var currentEmail: String = ""
 
         setContent {
@@ -65,21 +66,26 @@ class MainActivity : ComponentActivity() {
                 val scaffoldState = rememberScaffoldState()
                 val scope = rememberCoroutineScope()
 
+                // Observe the current backstack and get the current route
+                val currentBackStackEntry = navController.currentBackStackEntryAsState()
+                val currentRoute = currentBackStackEntry.value?.destination?.route
+
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = {
-
-                        AppBar(
-                            onNavigationIconClick = {
-                                scope.launch {
-                                    scaffoldState.drawerState.open()
+                        // Display AppBar only if the route is not signIn or signUp
+                        if (currentRoute != "signIn" && currentRoute != "signUp") {
+                            AppBar(
+                                onNavigationIconClick = {
+                                    scope.launch {
+                                        scaffoldState.drawerState.open()
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     },
                     drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
                     drawerContent = {
-                        // Use NavHostController to check the current route
                         DrawerHeader()
                         DrawerBody(
                             items = listOf(
@@ -108,8 +114,7 @@ class MainActivity : ComponentActivity() {
                                     icon = Icons.Default.ExitToApp
                                 )
                             ), onItemClick = { items ->
-                                //navController.navigate(it.id)
-                                if (items.id == "myMemberships?email={email}") { // Replace with the user's email
+                                if (items.id == "myMemberships?email={email}") {
                                     val route = "myMemberships?email=$currentEmail"
                                     navController.navigate(route)
                                 } else {
@@ -127,14 +132,6 @@ class MainActivity : ComponentActivity() {
                                 signInViewModel.signIn(navController, email, pass)
                                 currentEmailLogin.value = email
                             }
-                            signInViewModel.errorMessage.observe(this@MainActivity) { error ->
-                                if (error == null) { // Check if login was successful based on no error message
-                                    currentEmail = currentEmailLogin.value
-                                    val route = "myMemberships?email=$currentEmail"
-                                    navController.navigate(route)
-
-                                }
-                            }
                         }
                         composable("signUp") {
                             SignUpScreen(
@@ -151,17 +148,12 @@ class MainActivity : ComponentActivity() {
                             BrowseMemberships()
                         }
                         composable("myMemberships?email={email}") { backStackEntry ->
-                            // Retrieve the email from the navigation arguments
                             val email = backStackEntry.arguments?.getString("email")
-
                             MyMemberships(email)
-
                         }
                         composable("signOut") {
                             signInViewModel.signOut()
-                            SignInScreen(navController, signInViewModel) { email, pass ->
-                                signInViewModel.signIn(navController, email, pass)
-                            }
+                            navController.navigate("signIn")
                         }
                     }
                 }
@@ -169,3 +161,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+

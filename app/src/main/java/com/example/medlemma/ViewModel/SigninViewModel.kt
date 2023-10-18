@@ -15,11 +15,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
-
 private val auth: FirebaseAuth = Firebase.auth
 
 class SigninViewModel : ViewModel() {
-
     // Live stores the error message
     val errorMessage = MutableLiveData<String?>()
 
