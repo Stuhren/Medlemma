@@ -79,6 +79,49 @@ fun addCompanyToFirebase(
         }
 }
 
+fun updateCompanyInFirebase(
+    customId: String, // Pass the custom ID as a parameter
+    updatedCategory: String,
+    updatedCompanyName: String,
+    updatedRegisterUrl: String,
+    updatedCompanyLogo: String,
+    callback: (Boolean) -> Unit
+) {
+    val database = FirebaseDatabase.getInstance()
+    val companiesRef = database.getReference("companies")
+
+    // Assuming you have a structure where "id" is a field within the company data
+    // You can query the company with your custom ID
+    val query = companiesRef.orderByChild("id").equalTo(customId)
+
+    query.addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            if (snapshot.exists()) {
+                // Update the first matching company (custom ID)
+                for (dataSnapshot in snapshot.children) {
+                    val companyToUpdateRef = dataSnapshot.ref
+                    val updatedCompany = Company(updatedCategory, updatedCompanyName, updatedRegisterUrl, customId, updatedCompanyLogo)
+                    companyToUpdateRef.setValue(updatedCompany)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                callback(true) // Successfully updated the company
+                            } else {
+                                callback(false) // Failed to update the company
+                            }
+                        }
+                    break // Exit the loop after updating the first matching company
+                }
+            } else {
+                callback(false) // Custom ID not found
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            callback(false) // Error occurred during the query
+        }
+    })
+}
+
 class CompanyModel {
     private val _companyData = MutableStateFlow(emptyList<ViewCompany>())
     val companyData = _companyData.asStateFlow()
