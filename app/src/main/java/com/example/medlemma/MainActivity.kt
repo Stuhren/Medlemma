@@ -1,22 +1,23 @@
 package com.example.medlemma
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,18 +32,33 @@ import com.example.medlemma.View.BrowseMemberships
 import com.example.medlemma.View.DrawerBody
 import com.example.medlemma.View.DrawerHeader
 import com.example.medlemma.View.MyMemberships
+import com.example.medlemma.View.PersonalInfo
 import com.example.medlemma.ViewModel.AppBar
 import com.example.medlemma.ViewModel.CompanyViewModel
 import com.example.medlemma.ViewModel.MenuItem
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ViewModel.SigninViewModel
 import com.example.medlemma.ViewModel.SignupViewModel
+import com.example.medlemma.ViewModel.UserViewModel
 import kotlinx.coroutines.launch
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
+
+    init {
+        instance = this
+    }
+
+    companion object {
+        private var instance: MainActivity? = null
+
+        fun applicationContext(): Context {
+            return instance!!.applicationContext
+        }
+    }
+
     private lateinit var signUpViewModel: SignupViewModel
     private lateinit var signInViewModel: SigninViewModel
     private lateinit var myMembershipsViewModel: MyMembershipsViewModel
@@ -56,7 +72,7 @@ class MainActivity : ComponentActivity() {
         signUpViewModel = ViewModelProvider(this).get(SignupViewModel::class.java)
         signInViewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
         myMembershipsViewModel = ViewModelProvider(this).get(MyMembershipsViewModel::class.java)
-
+        val userViewModel: UserViewModel by viewModels()
         var currentEmail: String = ""
 
         setContent {
@@ -108,15 +124,24 @@ class MainActivity : ComponentActivity() {
                                     icon = Icons.Default.Edit
                                 ),
                                 MenuItem(
+                                    id = "personalInfo",
+                                    title = "Personal Info",
+                                    contentDescription = "Edit personal info",
+                                    icon = Icons.Default.AccountBox
+                                ),
+                                MenuItem(
                                     id = "signOut",
                                     title = "Sign Out",
                                     contentDescription = "Sign Out",
                                     icon = Icons.Default.ExitToApp
                                 )
                             ), onItemClick = { items ->
-                                if (items.id == "myMemberships?email={email}") {
+                                if (items.id == "myMemberships?email=$currentEmail") {
                                     val route = "myMemberships?email=$currentEmail"
                                     navController.navigate(route)
+                                }else if(items.id == "signOut"){
+                                    navController.navigate("signIn")
+
                                 } else {
                                     navController.navigate(items.id)
                                 }
@@ -127,10 +152,11 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
-                            val currentEmailLogin = remember { mutableStateOf("") }
+                            //val currentEmailLogin = remember { mutableStateOf("") }
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(navController, email, pass)
-                                currentEmailLogin.value = email
+                                currentEmail = email
+                                userViewModel.saveUserEmail(email)
                             }
                         }
                         composable("signUp") {
@@ -148,12 +174,16 @@ class MainActivity : ComponentActivity() {
                             BrowseMemberships()
                         }
                         composable("myMemberships?email={email}") { backStackEntry ->
-                            val email = backStackEntry.arguments?.getString("email")
+                            val email = backStackEntry.arguments?.getString("email") ?: userViewModel.userEmail.value ?: ""
                             MyMemberships(email)
                         }
                         composable("signOut") {
+                            userViewModel.saveUserEmail(null)
                             signInViewModel.signOut()
                             navController.navigate("signIn")
+                        }
+                        composable("personalInfo") {backStackEntry ->
+                            PersonalInfo(userViewModel.userEmail.value)
                         }
                     }
                 }
