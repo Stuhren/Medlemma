@@ -7,6 +7,9 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.UUID
 
 data class ViewCompany(
     val companyName: String,
@@ -16,21 +19,21 @@ data class ViewCompany(
     val companyLogo: String
 )
 
-fun getCompanyCountFromFirebase(callback: (Int) -> Unit) {
-    val database = FirebaseDatabase.getInstance()
-    val companiesRef = database.getReference("companies")
+fun generateCustomID(callback: (String) -> Unit) {
+    // Get the current timestamp in milliseconds
+    val timestamp = System.currentTimeMillis()
 
-    companiesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-        override fun onDataChange(dataSnapshot: DataSnapshot) {
-            val companyCount = dataSnapshot.childrenCount.toInt()
-            callback(companyCount)
-        }
+    // Get the current date in a specific format
+    val dateFormat = SimpleDateFormat("yyyyMMddHHmmss")
+    val currentDate = dateFormat.format(Date())
 
-        override fun onCancelled(databaseError: DatabaseError) {
-            println("Firebase Database Error: ${databaseError.message}")
-            callback(-1) // Return -1 to indicate an error
-        }
-    })
+    // Generate a random UUID
+    val randomUUID = UUID.randomUUID().toString()
+
+    // Combine the timestamp, current date, and random UUID to create a custom ID
+    val customID = "$currentDate-$timestamp-$randomUUID"
+
+    callback(customID)
 }
 
 fun uploadImageToFirebaseStorage(uri: Uri, imageName: String, callback: (String?) -> Unit) {
