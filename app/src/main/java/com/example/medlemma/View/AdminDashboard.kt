@@ -233,6 +233,7 @@ private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun CompanyView(viewModel: CompanyViewModel) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
@@ -253,12 +254,13 @@ private fun CompanyView(viewModel: CompanyViewModel) {
         // SEARCH FIELD
         val searchState = rememberSaveable { mutableStateOf("") }
         OutlinedTextField(
-            value = searchState.value,
-            onValueChange = { searchState.value = it },
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
             label = { Text("Search (Company Name)") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }))
+            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
+        )
     }
 
 
@@ -266,24 +268,27 @@ private fun CompanyView(viewModel: CompanyViewModel) {
     Spacer(modifier = Modifier.height(20.dp))
 
     // Display the list of companies
-    CompanyList(viewModel)
+    CompanyList(viewModel, searchQuery)
 
     Spacer(modifier = Modifier.height(60.dp))
 }
 
 
 @Composable
-private fun CompanyList(viewModel: CompanyViewModel) {
+private fun CompanyList(viewModel: CompanyViewModel, searchQuery: String) {
     val companyData by viewModel.companyData.collectAsState()
 
     Column {
         // Display company data and "Delete" button for each company
         for (company in companyData) {
-            CompanyItem(company = company) {
-                // Implement the delete logic in the ViewModel
-                viewModel.deleteCompany(company)
+            // Filter companies based on the search query
+            if (company.companyName.contains(searchQuery, true)) {
+                CompanyItem(company = company) {
+                    // Implement the delete logic in the ViewModel
+                    viewModel.deleteCompany(company)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
