@@ -49,11 +49,14 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                 .padding(16.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset(y = (-20).dp), // Move everything up by 30 dp
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val logo: Painter = painterResource(id = R.drawable.medlemmalogo)
+
                 Image(
                     painter = logo,
                     contentDescription = "Medlemma Logo",
@@ -115,7 +118,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 Button(modifier = Modifier.width(220.dp),
                     contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp),
@@ -198,7 +201,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                         modifier = Modifier
                             .align(Alignment.Center)
                             .padding(8.dp)
-                            .padding(top = 40.dp)
+                            .padding(top = 180.dp)
                     )
                 }
             }
