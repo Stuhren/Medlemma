@@ -34,6 +34,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -42,11 +43,12 @@ import com.example.medlemma.Model.addCompanyToFirebase
 import com.example.medlemma.Model.getCompanyCountFromFirebase
 import com.example.medlemma.Model.uploadImageToFirebaseStorage
 import com.example.medlemma.ViewModel.CompanyViewModel
-import com.example.medlemma.ui.theme.Blue
 import java.util.UUID
 
 @Composable
 fun AdminDashboard(companyViewModel: CompanyViewModel) {
+
+
     MedlemmaTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -133,7 +135,8 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             value = registerurlState.value,
             onValueChange = { registerurlState.value = it },
             label = { Text("Register Url") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
         )
@@ -235,6 +238,8 @@ private fun CompanyView(viewModel: CompanyViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(30.dp))
+        Divider(color = Color.Gray, thickness = 1.dp)
+        Spacer(modifier = Modifier.height(30.dp))
 
         // REGISTERED USERS
         Text(
@@ -254,9 +259,7 @@ private fun CompanyView(viewModel: CompanyViewModel) {
             keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }))
     }
 
-    Spacer(modifier = Modifier.height(30.dp))
 
-    Divider(color = Color.Gray, thickness = 1.dp)
 
     Spacer(modifier = Modifier.height(20.dp))
 
@@ -283,39 +286,72 @@ private fun CompanyList(viewModel: CompanyViewModel) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
+    // Create text field values for each field
+    var companyName by remember { mutableStateOf(company.companyName) }
+    var category by remember { mutableStateOf(company.category) }
+    var registerUrl by remember { mutableStateOf(company.registerUrl) }
+    var companyLogo by remember { mutableStateOf(company.companyLogo) }
+
+    val textFieldColors = TextFieldDefaults.textFieldColors(
+        containerColor = SoftGray,
+    )
+
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .background(Color.White)
+            .background(DarkGray)
             .clickable { /* Handle item click if needed */ }
     ) {
-        Text(
-            text = "Company Name: ${company.companyName}",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp)
-        )
         Text(
             text = "Company ID: ${company.id}",
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp)
         )
-        Text(
-            text = "Category: ${company.category}",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp)
+
+        // Display editable text fields
+        TextField(
+            value = companyName,
+            onValueChange = { companyName = it },
+            label = { Text("Company Name") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(shape = CustomShapes.medium)
         )
-        Text(
-            text = "Register Url: ${company.registerUrl}", // Display the Register Url
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp)
+
+        TextField(
+            value = category,
+            onValueChange = { category = it },
+            label = { Text("Category") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(shape = CustomShapes.medium)
         )
-        Text(
-            text = "Company Logo: ${company.companyLogo}", // Display the Company Logo
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp)
+
+        TextField(
+            value = registerUrl,
+            onValueChange = { registerUrl = it },
+            label = { Text("Register URL") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(shape = CustomShapes.medium)
         )
+
+        TextField(
+            value = companyLogo,
+            onValueChange = { companyLogo = it },
+            label = { Text("Company Logo") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
+                .clip(shape = CustomShapes.medium)
+        )
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -327,14 +363,16 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             ) {
                 Text("Delete")
             }
+
             Button(
-                onClick = { /* Handle update button click (no logic for now) */ },
-                colors = ButtonDefaults.buttonColors(Blue),
+                onClick = { /* Handle the update action visually */ },
+                colors = ButtonDefaults.buttonColors(blue2),
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text("Update")
             }
         }
+
         Divider(
             color = Color.Gray,
             thickness = 1.dp,
