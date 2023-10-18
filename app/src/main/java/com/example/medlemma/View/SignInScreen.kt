@@ -45,10 +45,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
 
     val userViewModel = ViewModelProvider(LocalContext.current as ComponentActivity).get(UserViewModel::class.java)
     if (userViewModel.userEmail.value != null) {
-        navController.navigate("myMemberships?email=${userViewModel.userEmail.value}")
-    } else {
-        // Render your sign-in UI
-        navController.navigate("myMemberships?email={email}")
+        navController.navigate("myMemberships")
     }
 
 
