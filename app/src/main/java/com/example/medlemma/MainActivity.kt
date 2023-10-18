@@ -73,7 +73,6 @@ class MainActivity : ComponentActivity() {
         signInViewModel = ViewModelProvider(this).get(SigninViewModel::class.java)
         myMembershipsViewModel = ViewModelProvider(this).get(MyMembershipsViewModel::class.java)
         val userViewModel: UserViewModel by viewModels()
-        var currentEmail: String = ""
 
         setContent {
             val navController = rememberNavController()
@@ -106,7 +105,7 @@ class MainActivity : ComponentActivity() {
                         DrawerBody(
                             items = listOf(
                                 MenuItem(
-                                    id = "myMemberships?email={email}",
+                                    id = "myMemberships",
                                     title = "My Memberships",
                                     contentDescription = "My Memberships",
                                     icon = Icons.Default.CheckCircle
@@ -135,16 +134,18 @@ class MainActivity : ComponentActivity() {
                                     contentDescription = "Sign Out",
                                     icon = Icons.Default.ExitToApp
                                 )
-                            ), onItemClick = { items ->
-                                if (items.id == "myMemberships?email=$currentEmail") {
-                                    val route = "myMemberships?email=$currentEmail"
-                                    navController.navigate(route)
-                                }else if(items.id == "signOut"){
-                                    navController.navigate("signIn")
+                            ), onItemClick = {items ->
 
-                                } else {
-                                    navController.navigate(items.id)
+                                when (items.id) {
+                                    //"myMemberships" -> navController.navigate("myMemberships")
+                                    "signOut" -> {
+                                        userViewModel.saveUserEmail(null)
+                                        signInViewModel.signOut()
+                                        navController.navigate("signIn")
+                                    }
+                                    else -> navController.navigate(items.id)
                                 }
+
                             },
                             scaffoldState = scaffoldState
                         )
@@ -155,7 +156,6 @@ class MainActivity : ComponentActivity() {
                             //val currentEmailLogin = remember { mutableStateOf("") }
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(navController, email, pass)
-                                currentEmail = email
                                 userViewModel.saveUserEmail(email)
                             }
                         }
@@ -173,16 +173,15 @@ class MainActivity : ComponentActivity() {
                         composable("browseMemberships") {
                             BrowseMemberships()
                         }
-                        composable("myMemberships?email={email}") { backStackEntry ->
-                            val email = backStackEntry.arguments?.getString("email") ?: userViewModel.userEmail.value ?: ""
-                            MyMemberships(email)
+                        composable("myMemberships") {
+                            MyMemberships(userViewModel.userEmail.value)
                         }
                         composable("signOut") {
                             userViewModel.saveUserEmail(null)
                             signInViewModel.signOut()
                             navController.navigate("signIn")
                         }
-                        composable("personalInfo") {backStackEntry ->
+                        composable("personalInfo") {
                             PersonalInfo(userViewModel.userEmail.value)
                         }
                     }
