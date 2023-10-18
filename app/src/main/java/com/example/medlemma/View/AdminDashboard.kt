@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import com.example.medlemma.Model.ViewCompany
 import com.example.medlemma.Model.addCompanyToFirebase
 import com.example.medlemma.Model.getCompanyCountFromFirebase
+import com.example.medlemma.Model.updateCompanyInFirebase
 import com.example.medlemma.Model.uploadImageToFirebaseStorage
 import com.example.medlemma.ViewModel.CompanyViewModel
 import java.util.UUID
@@ -130,10 +131,10 @@ private fun AddCompany(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(10.dp))
 
-        val registerurlState = rememberSaveable { mutableStateOf("") }
+        val registerUrlState = rememberSaveable { mutableStateOf("") }
         OutlinedTextField(
-            value = registerurlState.value,
-            onValueChange = { registerurlState.value = it },
+            value = registerUrlState.value,
+            onValueChange = { registerUrlState.value = it },
             label = { Text("Register Url") },
             modifier = Modifier
                 .fillMaxWidth(),
@@ -158,19 +159,20 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                 }
             }) {
                 Text("Fetch Company ID")
-            }
+                Spacer(modifier = Modifier.padding(start = 4.dp))
+                when (iconState1.value) {
+                    IconState.NOT_COMPLETED -> {
+                        CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
+                    }
 
-
-            when (iconState1.value) {
-                IconState.NOT_COMPLETED -> {
-                    CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 167.dp, yOffset = 10.dp)
-                }
-
-                IconState.COMPLETED -> {
-                    CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 167.dp, yOffset = 10.dp)
+                    IconState.COMPLETED -> {
+                        CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 0.dp, yOffset = 0.dp)
+                    }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(5.dp))
 
 
         Row(
@@ -181,16 +183,17 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                 launcher.launch("image/*")
             }) {
                 Text("Upload Company Logo")
+                Spacer(modifier = Modifier.padding(start = 4.dp))
+                when (iconState2.value) {
+                    IconState.NOT_COMPLETED -> {
+                        CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
+                    }
+                    IconState.COMPLETED -> {
+                        CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 0.dp, yOffset = 0.dp)
+                    }
+                }
             }
 
-            when (iconState2.value) {
-                IconState.NOT_COMPLETED -> {
-                    CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 32.dp, yOffset = 10.dp)
-                }
-                IconState.COMPLETED -> {
-                    CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 32.dp, yOffset = 10.dp)
-                }
-            }
 
             Button(onClick = {
                 // Check if newCompanyId is not null before using it
@@ -198,7 +201,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                     addCompanyToFirebase(
                         categoryState.value,
                         nameState.value,
-                        registerurlState.value,
+                        registerUrlState.value,
                         companyId.toString(),
                         downloadUrl ?: ""
                     ) { success ->
@@ -294,6 +297,24 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
     var category by remember { mutableStateOf(company.category) }
     var registerUrl by remember { mutableStateOf(company.registerUrl) }
     var companyLogo by remember { mutableStateOf(company.companyLogo) }
+    val iconState3 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
+    var downloadUrl by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            val imageName = "your_image_name_${UUID.randomUUID()}.jpg" // Generate a unique name for the image
+            uploadImageToFirebaseStorage(uri, imageName) { imageUrl ->
+                if (imageUrl != null) {
+                    downloadUrl = imageUrl
+                    companyLogo = imageUrl
+                    iconState3.value = IconState.COMPLETED
+                } else {
+                    // Handle the upload error
+                }
+            }
+        }
+    }
 
     val textFieldColors = TextFieldDefaults.textFieldColors(
         containerColor = SoftGray,
@@ -319,7 +340,6 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             colors = textFieldColors,
             modifier = Modifier
                 .padding(8.dp)
-                .clip(shape = CustomShapes.medium)
         )
 
         TextField(
@@ -329,7 +349,6 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             colors = textFieldColors,
             modifier = Modifier
                 .padding(8.dp)
-                .clip(shape = CustomShapes.medium)
         )
 
         TextField(
@@ -339,7 +358,6 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             colors = textFieldColors,
             modifier = Modifier
                 .padding(8.dp)
-                .clip(shape = CustomShapes.medium)
         )
 
         TextField(
@@ -349,8 +367,35 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             colors = textFieldColors,
             modifier = Modifier
                 .padding(8.dp)
-                .clip(shape = CustomShapes.medium)
         )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = {
+                launcher.launch("image/*")
+            },
+                colors =ButtonDefaults.buttonColors(SoftGray, contentColor = Color.Black),
+                modifier = Modifier.padding(8.dp)
+                ) {
+                Text("Upload New Company Logo")
+                Spacer(modifier = Modifier.padding(start = 4.dp))
+                when (iconState3.value) {
+                    IconState.NOT_COMPLETED -> {
+                        CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
+                    }
+
+                    IconState.COMPLETED -> {
+                        CustomIcon(
+                            Icons.Outlined.CheckCircle,
+                            Color.Green,
+                            xOffset = 0.dp,
+                            yOffset = 0.dp
+                        )
+                    }
+                }
+            }
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -365,13 +410,30 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             }
 
             Button(
-                onClick = { /* Handle the update action visually */ },
+                onClick = {
+                    // Perform the update action here
+                    updateCompanyInFirebase(
+                        company.id,  // Pass the ID of the company
+                        category,
+                        companyName,
+                        registerUrl,
+                        companyLogo
+                    ) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Updated the company", Toast.LENGTH_LONG).show()
+                        } else {
+                            // Failed to add the company, handle the error
+                            Toast.makeText(context, "Failed to update the company", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(blue2),
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text("Update")
             }
         }
+
 
         Divider(
             color = Color.Gray,
@@ -398,5 +460,3 @@ fun CompanyScreen(viewModel: CompanyViewModel) {
 
     CompanyView(viewModel)
 }
-
-
