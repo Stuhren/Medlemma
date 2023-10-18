@@ -34,13 +34,12 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import com.example.medlemma.Model.ViewCompany
 import com.example.medlemma.Model.addCompanyToFirebase
-import com.example.medlemma.Model.getCompanyCountFromFirebase
+import com.example.medlemma.Model.generateCustomID
 import com.example.medlemma.Model.updateCompanyInFirebase
 import com.example.medlemma.Model.uploadImageToFirebaseStorage
 import com.example.medlemma.ViewModel.CompanyViewModel
@@ -78,7 +77,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
     val iconState1 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
     val iconState2 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
     var downloadUrl by remember { mutableStateOf<String?>(null) }
-    var newCompanyId by remember { mutableStateOf<Int?>(null) }
+    var newCompanyId by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -149,9 +148,9 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = {
-                getCompanyCountFromFirebase { companyCount ->
-                    if (companyCount != -1) {
-                        newCompanyId = companyCount + 1
+                generateCustomID{ customID ->
+                    if (customID != null) {
+                        newCompanyId = customID
                         iconState1.value = IconState.COMPLETED
                     } else {
                         println("Failed to retrieve company ID from Firebase.")
