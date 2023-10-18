@@ -2,6 +2,7 @@ package com.example.medlemma.View
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -35,20 +36,20 @@ import com.example.medlemma.ui.theme.CustomShapes
 import com.example.medlemma.ui.theme.MedlemmaTheme
 import com.example.medlemma.ViewModel.UserViewModel
 import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProvider
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signInAction: (email: String, pass: String) -> Unit) {
-/*
-    val userViewModel: UserViewModel by viewModels()
+
+    val userViewModel = ViewModelProvider(LocalContext.current as ComponentActivity).get(UserViewModel::class.java)
     if (userViewModel.userEmail.value != null) {
         navController.navigate("myMemberships?email=${userViewModel.userEmail.value}")
     } else {
         // Render your sign-in UI
+        navController.navigate("myMemberships?email={email}")
     }
-
- */
 
 
     MedlemmaTheme {

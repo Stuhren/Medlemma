@@ -21,7 +21,7 @@ class UserViewModel: ViewModel() {
         userEmail.value = sharedPreferences.getString(emailKey, null)
     }
 
-    fun saveUserEmail(email: String) {
+    fun saveUserEmail(email: String?) {
         userEmail.value = email
 
         // Save the user's email to SharedPreferences

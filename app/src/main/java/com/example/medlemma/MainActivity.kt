@@ -139,6 +139,9 @@ class MainActivity : ComponentActivity() {
                                 if (items.id == "myMemberships?email=$currentEmail") {
                                     val route = "myMemberships?email=$currentEmail"
                                     navController.navigate(route)
+                                }else if(items.id == "signOut"){
+                                    navController.navigate("signIn")
+
                                 } else {
                                     navController.navigate(items.id)
                                 }
@@ -149,10 +152,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
-                            val currentEmailLogin = remember { mutableStateOf("") }
+                            //val currentEmailLogin = remember { mutableStateOf("") }
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(navController, email, pass)
-                                currentEmailLogin.value = email
+                                currentEmail = email
                                 userViewModel.saveUserEmail(email)
                             }
                         }
@@ -175,6 +178,7 @@ class MainActivity : ComponentActivity() {
                             MyMemberships(email)
                         }
                         composable("signOut") {
+                            userViewModel.saveUserEmail(null)
                             signInViewModel.signOut()
                             navController.navigate("signIn")
                         }
