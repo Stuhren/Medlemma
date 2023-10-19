@@ -1,6 +1,7 @@
 package com.example.medlemma.Model
 
 import android.net.Uri
+import androidx.compose.runtime.MutableState
 import com.example.medlemma.ViewModel.Company
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -78,6 +79,40 @@ fun updateIdentificationURLForMember(
 
         override fun onCancelled(error: DatabaseError) {
             callback(false) // Error occurred during the query
+        }
+    })
+}
+
+fun isAdminUser(email: String?, onIsAdmin: (Boolean) -> Unit) {
+    val database = FirebaseDatabase.getInstance()
+    val membersRef = database.getReference("members")
+
+    // Query the database to find the member with the specified email
+    val query = membersRef.orderByChild("email").equalTo(email)
+    query.addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            if (snapshot.exists()) {
+                for (memberSnapshot in snapshot.children) {
+                    val role = memberSnapshot.child("role").getValue(String::class.java)
+                    if (role == "admin") {
+                        // The user has an "admin" role
+                        onIsAdmin(true)
+                    } else {
+                        // The user does not have an "admin" role
+                        onIsAdmin(false)
+                    }
+                    // Exit the loop since we found the user
+                    return
+                }
+            } else {
+                // User not found, or no such email in the database
+                onIsAdmin(false)
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            // Handle the error here
+            onIsAdmin(false)
         }
     })
 }

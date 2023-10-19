@@ -24,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.medlemma.Model.CompanyModel
+import com.example.medlemma.Model.isAdminUser
 import com.example.medlemma.ui.theme.MedlemmaTheme
 import com.example.medlemma.View.SignUpScreen
 import com.example.medlemma.View.SignInScreen
@@ -76,6 +77,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
+            val isAdminUser = remember { mutableStateOf(false) }
 
             MedlemmaTheme {
                 val scaffoldState = rememberScaffoldState()
@@ -85,11 +87,15 @@ class MainActivity : ComponentActivity() {
                 val currentBackStackEntry = navController.currentBackStackEntryAsState()
                 val currentRoute = currentBackStackEntry.value?.destination?.route
 
+
                 Scaffold(
                     scaffoldState = scaffoldState,
                     topBar = {
                         // Display AppBar only if the route is not signIn or signUp
                         if (currentRoute != "signIn" && currentRoute != "signUp") {
+                            isAdminUser(userViewModel.userEmail.value) { isAdmin ->
+                                isAdminUser.value = isAdmin
+                            }
                             AppBar(
                                 onNavigationIconClick = {
                                     scope.launch {
@@ -103,41 +109,72 @@ class MainActivity : ComponentActivity() {
                     drawerContent = {
                         DrawerHeader()
                         DrawerBody(
-                            items = listOf(
-                                MenuItem(
-                                    id = "myMemberships",
-                                    title = "My Memberships",
-                                    contentDescription = "My Memberships",
-                                    icon = Icons.Default.CheckCircle
-                                ),
-                                MenuItem(
-                                    id = "browseMemberships",
-                                    title = "Browse Memberships",
-                                    contentDescription = "Browse Memberships",
-                                    icon = Icons.Default.Search
-                                ),
-                                MenuItem(
-                                    id = "adminDashboard",
-                                    title = "Admin Dashboard",
-                                    contentDescription = "Admin Dashboard",
-                                    icon = Icons.Default.Edit
-                                ),
-                                MenuItem(
-                                    id = "personalInfo",
-                                    title = "Personal Info",
-                                    contentDescription = "Edit personal info",
-                                    icon = Icons.Default.AccountBox
-                                ),
-                                MenuItem(
-                                    id = "signOut",
-                                    title = "Sign Out",
-                                    contentDescription = "Sign Out",
-                                    icon = Icons.Default.ExitToApp
+                            items = if (isAdminUser.value) {
+                                // If the user is an admin, show all menu items, including Admin Dashboard
+                                listOf(
+                                    MenuItem(
+                                        id = "myMemberships",
+                                        title = "My Memberships",
+                                        contentDescription = "My Memberships",
+                                        icon = Icons.Default.CheckCircle
+                                    ),
+                                    MenuItem(
+                                        id = "browseMemberships",
+                                        title = "Browse Memberships",
+                                        contentDescription = "Browse Memberships",
+                                        icon = Icons.Default.Search
+                                    ),
+                                    MenuItem(
+                                        id = "adminDashboard",
+                                        title = "Admin Dashboard",
+                                        contentDescription = "Admin Dashboard",
+                                        icon = Icons.Default.Edit
+                                    ),
+                                    MenuItem(
+                                        id = "personalInfo",
+                                        title = "Personal Info",
+                                        contentDescription = "Edit personal info",
+                                        icon = Icons.Default.AccountBox
+                                    ),
+                                    MenuItem(
+                                        id = "signOut",
+                                        title = "Sign Out",
+                                        contentDescription = "Sign Out",
+                                        icon = Icons.Default.ExitToApp
+                                    )
                                 )
-                            ), onItemClick = {items ->
+                            } else {
+                                // If the user is not an admin, show all menu items except Admin Dashboard
+                                listOf(
+                                    MenuItem(
+                                        id = "myMemberships",
+                                        title = "My Memberships",
+                                        contentDescription = "My Memberships",
+                                        icon = Icons.Default.CheckCircle
+                                    ),
+                                    MenuItem(
+                                        id = "browseMemberships",
+                                        title = "Browse Memberships",
+                                        contentDescription = "Browse Memberships",
+                                        icon = Icons.Default.Search
+                                    ),
+                                    MenuItem(
+                                        id = "personalInfo",
+                                        title = "Personal Info",
+                                        contentDescription = "Edit personal info",
+                                        icon = Icons.Default.AccountBox
+                                    ),
+                                    MenuItem(
+                                        id = "signOut",
+                                        title = "Sign Out",
+                                        contentDescription = "Sign Out",
+                                        icon = Icons.Default.ExitToApp
+                                    )
+                                )
+                            },
+                            onItemClick = { items ->
 
                                 when (items.id) {
-                                    //"myMemberships" -> navController.navigate("myMemberships")
                                     "signOut" -> {
                                         userViewModel.saveUserEmail(null)
                                         signInViewModel.signOut()
