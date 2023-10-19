@@ -149,6 +149,11 @@ fun MyMemberships(email: String?) {
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .height(220.dp) // Adjust the height as needed
+                                            .border(
+                                                4.dp,
+                                                DarkGray,
+                                                shape = CustomShapes.medium
+                                            )
                                     )
                                 }
                             }
