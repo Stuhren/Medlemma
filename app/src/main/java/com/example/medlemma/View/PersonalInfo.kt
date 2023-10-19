@@ -1,5 +1,6 @@
 package com.example.medlemma.View
 
+import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
@@ -49,8 +50,15 @@ fun PersonalInfo(email: String?) {
         var downloadUrl by remember { mutableStateOf<String?>(null) }
         val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
         val currentMember = members.find { it.email == email }
+        //var imagePainter = rememberImagePainter(data = currentMember?.identificationURL)
 
+        var selectedImageUri by remember { mutableStateOf("") }
+
+        if (currentMember != null) {
+            selectedImageUri = currentMember.identificationURL
+        }
         val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            selectedImageUri = uri.toString()
             if (uri != null) {
                 val imageName = "your_image_name_${UUID.randomUUID()}.jpg" // Generate a unique name for the image
                 if (email != null) {
@@ -58,6 +66,7 @@ fun PersonalInfo(email: String?) {
                         if (imageUrl != null) {
                             downloadUrl = imageUrl
                             iconState2.value = IconState.COMPLETED
+
                         } else {
                             // Handle upload failure and show an error message
                         }
@@ -96,7 +105,7 @@ fun PersonalInfo(email: String?) {
                             )
                     ) {
                         Image(
-                            painter = rememberImagePainter(data = currentMember.identificationURL),
+                            painter = rememberImagePainter(data = selectedImageUri),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -110,6 +119,9 @@ fun PersonalInfo(email: String?) {
                 // Use a Button with clear instructions
                 Button(onClick = {
                     launcher.launch("image/*")
+                    selectedImageUri?.let { uri ->
+                        println("Selected URI: $uri")
+                    }
                 }) {
                     if (email != null) {
                         Text("Select your QR code")
