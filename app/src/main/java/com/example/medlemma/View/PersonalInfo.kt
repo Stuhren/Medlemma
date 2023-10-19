@@ -3,34 +3,52 @@ package com.example.medlemma.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberImagePainter
 import com.example.medlemma.Model.uploadImageToFirebaseStoragePersonalPhotos
 import com.example.medlemma.R
 import java.util.UUID
 import com.example.medlemma.ui.theme.MedlemmaTheme
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import com.example.medlemma.ui.theme.DarkGray
+import com.example.medlemma.ui.theme.blue2
+import java.time.format.TextStyle
+import com.example.medlemma.ViewModel.MyMembershipsViewModel
+import com.example.medlemma.ui.theme.CustomShapes
 
 @Composable
 fun PersonalInfo(email: String?) {
     MedlemmaTheme {
+        val viewModel: MyMembershipsViewModel = viewModel()
+
         val iconState2 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
         var downloadUrl by remember { mutableStateOf<String?>(null) }
+        val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
+        val currentMember = members.find { it.email == email }
 
         val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
@@ -41,22 +59,18 @@ fun PersonalInfo(email: String?) {
                             downloadUrl = imageUrl
                             iconState2.value = IconState.COMPLETED
                         } else {
-
+                            // Handle upload failure and show an error message
                         }
                     }
                 }
             }
         }
 
-
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val logo: Painter = painterResource(id = R.drawable.medlemmalogo)
@@ -64,16 +78,43 @@ fun PersonalInfo(email: String?) {
                 Image(
                     painter = logo,
                     contentDescription = "Medlemma Logo",
-                    modifier = Modifier.size(150.dp)
+                    modifier = Modifier
+                        .size(200.dp)
+                        .padding(top = 50.dp)
                 )
+                Spacer(modifier = Modifier.padding(20.dp))
 
+                if (currentMember != null) {
+                    Card(
+                        modifier = Modifier
+                            .width(200.dp) // Adjust the width as needed
+                            .height(200.dp) // Adjust the height as needed
+                            .border(
+                                4.dp,
+                                DarkGray,
+                                shape = CustomShapes.medium
+                            )
+                    ) {
+                        Image(
+                            painter = rememberImagePainter(data = currentMember.identificationURL),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.padding(20.dp))
+
+                // Use a Button with clear instructions
                 Button(onClick = {
                     launcher.launch("image/*")
                 }) {
                     if (email != null) {
-                        Text("User Email: $email")
+                        Text("Select your QR code")
                     }
-                    Spacer(modifier = Modifier.padding(start = 4.dp))
+
                     when (iconState2.value) {
                         IconState.NOT_COMPLETED -> {
                             CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
@@ -83,17 +124,18 @@ fun PersonalInfo(email: String?) {
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Text(
+                    text = "🚗 Upload Driver's License QR Code 📸",
+                    color = DarkGray,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
             }
         }
     }
 }
 
-@Composable
-private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp) {
-    Icon(
-        imageVector = icon,
-        contentDescription = null,
-        tint = color,
-        modifier = Modifier.size(30.dp) then  Modifier.offset(x = -xOffset, y = yOffset)
-    )
-}
+

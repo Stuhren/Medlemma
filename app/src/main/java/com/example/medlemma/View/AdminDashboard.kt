@@ -221,7 +221,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
 
 
 @Composable
-private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp) {
+fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp) {
     Icon(
         imageVector = icon,
         contentDescription = null,
