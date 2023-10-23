@@ -15,10 +15,12 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -41,6 +43,7 @@ import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ViewModel.SigninViewModel
 import com.example.medlemma.ViewModel.SignupViewModel
 import com.example.medlemma.ViewModel.UserViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 
@@ -190,10 +193,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
-                            //val currentEmailLogin = remember { mutableStateOf("") }
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(navController, email, pass)
-                                userViewModel.saveUserEmail(email)
+                                //userViewModel.saveUserEmail(email)
                             }
                         }
                         composable("signUp") {
@@ -211,7 +213,9 @@ class MainActivity : ComponentActivity() {
                             BrowseMemberships()
                         }
                         composable("myMemberships") {
-                            MyMemberships(userViewModel.userEmail.value)
+                            protectRoute(navController) { user ->
+                                MyMemberships(user)
+                            }
                         }
                         composable("signOut") {
                             userViewModel.saveUserEmail(null)
@@ -225,6 +229,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+@Composable
+fun protectRoute(navController: NavController, content: @Composable (user: String) -> Unit) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    if (currentUser != null) {
+        content(currentUser.email ?: "")  // passing email as the user. Adjust accordingly if you have a different requirement.
+    } else {
+        // If user isn't authenticated, navigate them back to the sign-in screen
+        navController.navigate("signIn")
     }
 }
 

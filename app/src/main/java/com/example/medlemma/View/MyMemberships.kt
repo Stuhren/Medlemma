@@ -182,10 +182,17 @@ fun MyMemberships(email: String?) {
                         Qr = currentMember.identificationURL,
                         logo = item.companyLogo,
                         Name = item.companyName,
-                    ) {
-                        showDialog = false // Close the dialog when needed
-                        selectedId = null // Reset the selected item
-                    }
+                        onDismiss = {
+                            showDialog = false
+                            selectedId = null
+                        },
+                        onDelete = {
+                            if (email != null) {
+                                viewModel.deleteMembership(email = email, companyId = selectedId!!)
+                            }
+                            showDialog = false
+                        }
+                    )
                 }
             }
         }

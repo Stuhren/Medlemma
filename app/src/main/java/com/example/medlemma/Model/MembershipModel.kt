@@ -79,6 +79,30 @@ object FirebaseRepository {
         }
     }
 
+    suspend fun deleteCompanyFromMember(uid: String, companyId: String) {
+        suspendCancellableCoroutine<Unit> { continuation ->
+            val memberReference = database.child("members").child(uid)
+            memberReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val memberships = dataSnapshot.child("currentMemberships").getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+                    val updatedMemberships = memberships.filter { it != companyId }
+                    memberReference.child("currentMemberships").setValue(updatedMemberships)
+                    continuation.resume(Unit) // Resume coroutine after operation is complete
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    continuation.resumeWithException(databaseError.toException()) // Handle error and resume coroutine
+                }
+            })
+
+            // Invoke cancellation if needed
+            continuation.invokeOnCancellation {
+                memberReference.removeEventListener(this as ValueEventListener)
+            }
+        }
+    }
+}
+
 
     /*
         suspend fun getCategories(): List<String> {
@@ -124,4 +148,4 @@ object FirebaseRepository {
         }
 
          */
-}
+

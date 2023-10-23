@@ -31,7 +31,8 @@ fun SimpleDialog(
     logo: String,
     Name: String,
     Qr: String,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Dialog(
         onDismissRequest = { onDismiss() },
@@ -80,6 +81,15 @@ fun SimpleDialog(
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(32.dp))
+                    Button(
+                        onClick = {
+                            onDismiss()
+                            onDelete() // Callback for deletion
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = "Delete")
+                    }
                     Button(
                         onClick = {
                             onDismiss()
