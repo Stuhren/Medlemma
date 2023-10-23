@@ -7,12 +7,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -25,6 +27,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,6 +47,7 @@ import com.example.medlemma.ui.theme.blue2
 import java.time.format.TextStyle
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ui.theme.CustomShapes
+import com.example.medlemma.ui.theme.RedTest
 
 @Composable
 fun PersonalInfo(email: String?) {
@@ -116,7 +123,14 @@ fun PersonalInfo(email: String?) {
                     }
                 }
 
-                Spacer(modifier = Modifier.padding(20.dp))
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Text(
+                    text = "🚗 Upload Driver's License QR Code 📸",
+                    color = DarkGray,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
                 // Use a Button with clear instructions
                 Button(onClick = {
@@ -139,43 +153,40 @@ fun PersonalInfo(email: String?) {
                     }
                 }
 
-                Spacer(modifier = Modifier.padding(10.dp))
+                Spacer(modifier = Modifier.padding(5.dp))
 
-                Text(
-                    text = "🚗 Upload Driver's License QR Code 📸",
-                    color = DarkGray,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                )
 
-                Spacer(modifier = Modifier.padding(10.dp))
+                Text("Delete your QR code 🗑️", color = DarkGray)
 
-                Button(onClick = {
-                    if (email != null) {
-                        removeIdentification(email) { removed ->
-                            if (removed) {
-                                iconState3.value = IconState.COMPLETED
-                                selectedImageUri = ""
-                            } else {
-                                // Failed to remove the QR code
-                                // Handle the failure, e.g., show an error message
+                val deleteText = "Delete"
+                val deleteString = AnnotatedString.Builder().apply {
+                    withStyle(
+                        style = SpanStyle(
+                            color = RedTest // You can change the color as needed
+                        )
+                    ) {
+                        append(deleteText)
+                    }
+                }.toAnnotatedString()
+
+                ClickableText(
+                    text = deleteString,
+                    style = MaterialTheme.typography.bodyLarge,
+                    onClick = {
+                        // Handle the delete action here
+                        if (email != null) {
+                            removeIdentification(email) { removed ->
+                                if (removed) {
+                                    // Handle successful deletion
+                                    iconState3.value = IconState.COMPLETED
+                                    selectedImageUri = ""
+                                } else {
+                                    // Handle the failure, e.g., show an error message
+                                }
                             }
                         }
                     }
-                }) {
-                    if (email != null) {
-                        Text("Remove your QR code")
-                    }
-
-                    when (iconState3.value) {
-                        IconState.NOT_COMPLETED -> {
-                            CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
-                        }
-                        IconState.COMPLETED -> {
-                            CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 0.dp, yOffset = 0.dp)
-                        }
-                    }
-                }
+                )
             }
         }
     }
