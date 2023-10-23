@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
+import com.example.medlemma.Model.removeIdentification
 import com.example.medlemma.Model.uploadImageToFirebaseStoragePersonalPhotos
 import com.example.medlemma.R
 import java.util.UUID
@@ -47,6 +48,7 @@ fun PersonalInfo(email: String?) {
         val viewModel: MyMembershipsViewModel = viewModel()
 
         val iconState2 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
+        val iconState3 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
         var downloadUrl by remember { mutableStateOf<String?>(null) }
         val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
         val currentMember = members.find { it.email == email }
@@ -145,9 +147,36 @@ fun PersonalInfo(email: String?) {
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Button(onClick = {
+                    if (email != null) {
+                        removeIdentification(email) { removed ->
+                            if (removed) {
+                                iconState3.value = IconState.COMPLETED
+                                selectedImageUri = ""
+                            } else {
+                                // Failed to remove the QR code
+                                // Handle the failure, e.g., show an error message
+                            }
+                        }
+                    }
+                }) {
+                    if (email != null) {
+                        Text("Remove your QR code")
+                    }
+
+                    when (iconState3.value) {
+                        IconState.NOT_COMPLETED -> {
+                            CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
+                        }
+                        IconState.COMPLETED -> {
+                            CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 0.dp, yOffset = 0.dp)
+                        }
+                    }
+                }
             }
         }
     }
 }
-
-

@@ -117,5 +117,66 @@ fun isAdminUser(email: String?, onIsAdmin: (Boolean) -> Unit) {
     })
 }
 
+fun removeIdentification(email: String, callback: (Boolean) -> Unit) {
+    val database = FirebaseDatabase.getInstance()
+    val membersRef = database.getReference("members")
 
+    // Query the member with the specified email
+    val query = membersRef.orderByChild("email").equalTo(email)
 
+    query.addListenerForSingleValueEvent(object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            if (snapshot.exists()) {
+                // Remove the identificationURL for the first matching member
+                for (dataSnapshot in snapshot.children) {
+                    val memberToUpdateRef = dataSnapshot.ref
+                    val identificationURL = dataSnapshot.child("identificationURL").getValue(String::class.java)
+
+                    if (identificationURL != null) {
+                        memberToUpdateRef.child("identificationURL").removeValue()
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    // Successfully removed the identificationURL
+                                    // Now, delete the corresponding image from Firebase Storage
+                                    deleteImageFromFirebaseStorage(identificationURL) { deleteResult ->
+                                        if (deleteResult) {
+                                            callback(true) // Successfully removed identificationURL and image
+                                        } else {
+                                            callback(false) // Failed to remove the image
+                                        }
+                                    }
+                                } else {
+                                    callback(false) // Failed to remove identificationURL
+                                }
+                            }
+                        break // Exit the loop after removing the first matching member's identificationURL
+                    } else {
+                        callback(false) // No identificationURL found for the member
+                    }
+                }
+            } else {
+                callback(false) // Member with the specified email not found
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            callback(false) // Error occurred during the query
+        }
+    })
+}
+
+// Function to delete the image from Firebase Storage
+fun deleteImageFromFirebaseStorage(identificationURL: String, callback: (Boolean) -> Unit) {
+    val storage = FirebaseStorage.getInstance()
+
+    // Parse the URL to get the reference
+    val pathReference = storage.getReferenceFromUrl(identificationURL)
+
+    pathReference.delete().addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            callback(true) // Successfully deleted the image
+        } else {
+            callback(false) // Failed to delete the image
+        }
+    }
+}
