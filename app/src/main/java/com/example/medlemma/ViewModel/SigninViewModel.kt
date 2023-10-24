@@ -1,3 +1,5 @@
+
+
 package com.example.medlemma.ViewModel
 
 import androidx.compose.runtime.getValue
@@ -28,13 +30,13 @@ class SigninViewModel : ViewModel() {
         }
         // Attempt sign in
         auth.signInWithEmailAndPassword(email, pass)
-            // Sign in successful
             .addOnSuccessListener { userCredential ->
                 errorMessage.value = null // clear any previous errors
-                // Signed in
-                val user = userCredential.user
-                //navController.navigate("myMemberships")
-                // ...
+                // Navigate to myMemberships after successful login
+                navController.navigate("myMemberships") {
+                    // Clears the navigation stack to prevent going back to signIn after logging in
+                    popUpTo("signIn") { inclusive = true }
+                }
             }
             // Sign in failed
             .addOnFailureListener { exception ->
