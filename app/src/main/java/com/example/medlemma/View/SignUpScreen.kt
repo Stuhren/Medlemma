@@ -197,7 +197,7 @@ fun SignUpScreen(navController: NavController, viewModel: SignupViewModel, signU
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(8.dp)
-                            .padding(bottom = 250.dp)
+                            .padding(bottom = 280.dp)
                     )
                 }
             }

@@ -79,6 +79,49 @@ object FirebaseRepository {
         }
     }
 
+    fun removeMembershipFromCurrentMemberships(email: String?, companyId: String, callback: (Boolean) -> Unit) {
+        val database = FirebaseDatabase.getInstance()
+        val membersRef = database.getReference("members")
+
+        // Query the member with the specified email
+        val query = membersRef.orderByChild("email").equalTo(email)
+
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (dataSnapshot in snapshot.children) {
+                        val memberToUpdateRef = dataSnapshot.ref
+                        val currentMemberships = dataSnapshot.child("currentMemberships")
+
+                        if (currentMemberships.exists()) {
+                            for (membershipSnapshot in currentMemberships.children) {
+                                val membershipId = membershipSnapshot.getValue(String::class.java)
+                                if (membershipId == companyId) {
+                                    membershipSnapshot.ref.removeValue()
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                callback(true) // Successfully removed the membership from currentMemberships
+                                            } else {
+                                                callback(false) // Failed to remove the membership
+                                            }
+                                        }
+                                }
+                            }
+                        } else {
+                            callback(false) // currentMemberships array not found
+                        }
+                    }
+                } else {
+                    callback(false) // Member with the specified email not found
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(false) // Error occurred during the query
+            }
+        })
+    }
+
 
     /*
         suspend fun getCategories(): List<String> {

@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.medlemma.Model.FirebaseRepository
+import com.example.medlemma.Model.FirebaseRepository.removeMembershipFromCurrentMemberships
 import com.example.medlemma.ui.theme.DarkGray
 import com.example.medlemma.ui.theme.MedlemmaTheme
 
@@ -37,7 +38,6 @@ import com.example.medlemma.ui.theme.MedlemmaTheme
 fun MyMemberships(email: String?) {
     MedlemmaTheme {
         val viewModel: MyMembershipsViewModel = viewModel()
-
         val view = LocalContext.current
 
         val members by viewModel.fetchAllMembers().observeAsState(initial = emptyList())
@@ -149,6 +149,11 @@ fun MyMemberships(email: String?) {
                                         modifier = Modifier
                                             .fillMaxSize()
                                             .height(220.dp) // Adjust the height as needed
+                                            .border(
+                                                4.dp,
+                                                DarkGray,
+                                                shape = CustomShapes.medium
+                                            )
                                     )
                                 }
                             }
@@ -177,10 +182,22 @@ fun MyMemberships(email: String?) {
                         Qr = currentMember.identificationURL,
                         logo = item.companyLogo,
                         Name = item.companyName,
-                    ) {
-                        showDialog = false // Close the dialog when needed
-                        selectedId = null // Reset the selected item
-                    }
+                        onRemoveClick = {
+                            removeMembershipFromCurrentMemberships(email, item.id) { success ->
+                                if (success) {
+                                    selectedCategory = "Alla"
+                                } else {
+
+                                }
+                            }
+                            showDialog = false
+                            selectedId = null
+                        },
+                        onDismiss = {
+                            showDialog = false
+                            selectedId = null
+                        }
+                    )
                 }
             }
         }

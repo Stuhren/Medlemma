@@ -39,14 +39,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import com.example.medlemma.Model.ViewCompany
 import com.example.medlemma.Model.addCompanyToFirebase
-import com.example.medlemma.Model.getCompanyCountFromFirebase
+import com.example.medlemma.Model.generateCustomID
+import com.example.medlemma.Model.updateCompanyInFirebase
 import com.example.medlemma.Model.uploadImageToFirebaseStorage
 import com.example.medlemma.ViewModel.CompanyViewModel
-import com.example.medlemma.ui.theme.Blue
 import java.util.UUID
 
 @Composable
 fun AdminDashboard(companyViewModel: CompanyViewModel) {
+
+
     MedlemmaTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -75,7 +77,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
     val iconState1 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
     val iconState2 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
     var downloadUrl by remember { mutableStateOf<String?>(null) }
-    var newCompanyId by remember { mutableStateOf<Int?>(null) }
+    var newCompanyId by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -128,12 +130,13 @@ private fun AddCompany(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(10.dp))
 
-        val registerurlState = rememberSaveable { mutableStateOf("") }
+        val registerUrlState = rememberSaveable { mutableStateOf("") }
         OutlinedTextField(
-            value = registerurlState.value,
-            onValueChange = { registerurlState.value = it },
+            value = registerUrlState.value,
+            onValueChange = { registerUrlState.value = it },
             label = { Text("Register Url") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
         )
@@ -145,9 +148,9 @@ private fun AddCompany(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = {
-                getCompanyCountFromFirebase { companyCount ->
-                    if (companyCount != -1) {
-                        newCompanyId = companyCount + 1
+                generateCustomID{ customID ->
+                    if (customID != null) {
+                        newCompanyId = customID
                         iconState1.value = IconState.COMPLETED
                     } else {
                         println("Failed to retrieve company ID from Firebase.")
@@ -155,19 +158,20 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                 }
             }) {
                 Text("Fetch Company ID")
-            }
+                Spacer(modifier = Modifier.padding(start = 4.dp))
+                when (iconState1.value) {
+                    IconState.NOT_COMPLETED -> {
+                        CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
+                    }
 
-
-            when (iconState1.value) {
-                IconState.NOT_COMPLETED -> {
-                    CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 167.dp, yOffset = 10.dp)
-                }
-
-                IconState.COMPLETED -> {
-                    CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 167.dp, yOffset = 10.dp)
+                    IconState.COMPLETED -> {
+                        CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 0.dp, yOffset = 0.dp)
+                    }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(5.dp))
 
 
         Row(
@@ -178,16 +182,17 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                 launcher.launch("image/*")
             }) {
                 Text("Upload Company Logo")
+                Spacer(modifier = Modifier.padding(start = 4.dp))
+                when (iconState2.value) {
+                    IconState.NOT_COMPLETED -> {
+                        CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
+                    }
+                    IconState.COMPLETED -> {
+                        CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 0.dp, yOffset = 0.dp)
+                    }
+                }
             }
 
-            when (iconState2.value) {
-                IconState.NOT_COMPLETED -> {
-                    CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 32.dp, yOffset = 10.dp)
-                }
-                IconState.COMPLETED -> {
-                    CustomIcon(Icons.Outlined.CheckCircle, Color.Green, xOffset = 32.dp, yOffset = 10.dp)
-                }
-            }
 
             Button(onClick = {
                 // Check if newCompanyId is not null before using it
@@ -195,7 +200,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
                     addCompanyToFirebase(
                         categoryState.value,
                         nameState.value,
-                        registerurlState.value,
+                        registerUrlState.value,
                         companyId.toString(),
                         downloadUrl ?: ""
                     ) { success ->
@@ -216,7 +221,7 @@ private fun AddCompany(modifier: Modifier = Modifier) {
 
 
 @Composable
-private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp) {
+fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp) {
     Icon(
         imageVector = icon,
         contentDescription = null,
@@ -228,12 +233,15 @@ private fun CustomIcon(icon: ImageVector, color: Color, xOffset: Dp, yOffset: Dp
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun CompanyView(viewModel: CompanyViewModel) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     Column(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(30.dp))
+        Divider(color = Color.Gray, thickness = 1.dp)
         Spacer(modifier = Modifier.height(30.dp))
 
         // REGISTERED USERS
@@ -246,66 +254,153 @@ private fun CompanyView(viewModel: CompanyViewModel) {
         // SEARCH FIELD
         val searchState = rememberSaveable { mutableStateOf("") }
         OutlinedTextField(
-            value = searchState.value,
-            onValueChange = { searchState.value = it },
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
             label = { Text("Search (Company Name)") },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }))
+            keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() })
+        )
     }
 
-    Spacer(modifier = Modifier.height(30.dp))
 
-    Divider(color = Color.Gray, thickness = 1.dp)
 
     Spacer(modifier = Modifier.height(20.dp))
 
     // Display the list of companies
-    CompanyList(viewModel)
+    CompanyList(viewModel, searchQuery)
 
     Spacer(modifier = Modifier.height(60.dp))
 }
 
 
 @Composable
-private fun CompanyList(viewModel: CompanyViewModel) {
+private fun CompanyList(viewModel: CompanyViewModel, searchQuery: String) {
     val companyData by viewModel.companyData.collectAsState()
 
     Column {
         // Display company data and "Delete" button for each company
         for (company in companyData) {
-            CompanyItem(company = company) {
-                // Implement the delete logic in the ViewModel
-                viewModel.deleteCompany(company)
+            // Filter companies based on the search query
+            if (company.companyName.contains(searchQuery, true)) {
+                CompanyItem(company = company) {
+                    // Implement the delete logic in the ViewModel
+                    viewModel.deleteCompany(company)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
+    // Create text field values for each field
+    var companyName by remember { mutableStateOf(company.companyName) }
+    var category by remember { mutableStateOf(company.category) }
+    var registerUrl by remember { mutableStateOf(company.registerUrl) }
+    var companyLogo by remember { mutableStateOf(company.companyLogo) }
+    val iconState3 = remember { mutableStateOf(IconState.NOT_COMPLETED) }
+    var downloadUrl by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            val imageName = "your_image_name_${UUID.randomUUID()}.jpg" // Generate a unique name for the image
+            uploadImageToFirebaseStorage(uri, imageName) { imageUrl ->
+                if (imageUrl != null) {
+                    downloadUrl = imageUrl
+                    companyLogo = imageUrl
+                    iconState3.value = IconState.COMPLETED
+                } else {
+                    // Handle the upload error
+                }
+            }
+        }
+    }
+
+    val textFieldColors = TextFieldDefaults.textFieldColors(
+        containerColor = SoftGray,
+    )
+
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .background(Color.White)
+            .background(DarkGray)
             .clickable { /* Handle item click if needed */ }
     ) {
-        Text(
-            text = "Company Name: ${company.companyName}",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp)
-        )
         Text(
             text = "Company ID: ${company.id}",
             fontSize = 16.sp,
             modifier = Modifier.padding(8.dp)
         )
-        Text(
-            text = "Category: ${company.category}",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(8.dp)
+
+        // Display editable text fields
+        TextField(
+            value = companyName,
+            onValueChange = { companyName = it },
+            label = { Text("Company Name") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
         )
+
+        TextField(
+            value = category,
+            onValueChange = { category = it },
+            label = { Text("Category") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
+        )
+
+        TextField(
+            value = registerUrl,
+            onValueChange = { registerUrl = it },
+            label = { Text("Register URL") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
+        )
+
+        TextField(
+            value = companyLogo,
+            onValueChange = { companyLogo = it },
+            label = { Text("Company Logo") },
+            colors = textFieldColors,
+            modifier = Modifier
+                .padding(8.dp)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(onClick = {
+                launcher.launch("image/*")
+            },
+                colors =ButtonDefaults.buttonColors(SoftGray, contentColor = Color.Black),
+                modifier = Modifier.padding(8.dp)
+                ) {
+                Text("Upload New Company Logo")
+                Spacer(modifier = Modifier.padding(start = 4.dp))
+                when (iconState3.value) {
+                    IconState.NOT_COMPLETED -> {
+                        CustomIcon(Icons.Outlined.Clear, Color.Red, xOffset = 0.dp, yOffset = 0.dp)
+                    }
+
+                    IconState.COMPLETED -> {
+                        CustomIcon(
+                            Icons.Outlined.CheckCircle,
+                            Color.Green,
+                            xOffset = 0.dp,
+                            yOffset = 0.dp
+                        )
+                    }
+                }
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -317,14 +412,33 @@ private fun CompanyItem(company: ViewCompany, onDelete: () -> Unit) {
             ) {
                 Text("Delete")
             }
+
             Button(
-                onClick = { /* Handle update button click (no logic for now) */ },
-                colors = ButtonDefaults.buttonColors(Blue),
+                onClick = {
+                    // Perform the update action here
+                    updateCompanyInFirebase(
+                        company.id,  // Pass the ID of the company
+                        category,
+                        companyName,
+                        registerUrl,
+                        companyLogo
+                    ) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Updated the company", Toast.LENGTH_LONG).show()
+                        } else {
+                            // Failed to add the company, handle the error
+                            Toast.makeText(context, "Failed to update the company", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(blue2),
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text("Update")
             }
         }
+
+
         Divider(
             color = Color.Gray,
             thickness = 1.dp,
@@ -350,5 +464,3 @@ fun CompanyScreen(viewModel: CompanyViewModel) {
 
     CompanyView(viewModel)
 }
-
-

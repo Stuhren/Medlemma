@@ -31,7 +31,8 @@ fun SimpleDialog(
     logo: String,
     Name: String,
     Qr: String,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onRemoveClick: () -> Unit // Add this callback
 ) {
     Dialog(
         onDismissRequest = { onDismiss() },
@@ -80,13 +81,31 @@ fun SimpleDialog(
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(32.dp))
-                    Button(
-                        onClick = {
-                            onDismiss()
-                        },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "Close")
+                        Button(
+                            onClick = {
+                                onRemoveClick() // Call the onRemoveClick callback
+                                onDismiss()
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                        ) {
+                            Text(text = "Remove", color = Color.White)
+                        }
+                        Button(
+                            onClick = {
+                                onDismiss()
+                            },
+                            modifier = Modifier
+                                .weight(1f),
+                        ) {
+                            Text(text = "Close")
+                        }
                     }
                 }
             }

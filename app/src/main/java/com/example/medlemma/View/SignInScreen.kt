@@ -2,6 +2,8 @@ package com.example.medlemma.View
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -32,13 +34,21 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import com.example.medlemma.ui.theme.CustomShapes
 import com.example.medlemma.ui.theme.MedlemmaTheme
-
-
+import com.example.medlemma.ViewModel.UserViewModel
+import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProvider
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signInAction: (email: String, pass: String) -> Unit) {
+
+    val userViewModel = ViewModelProvider(LocalContext.current as ComponentActivity).get(UserViewModel::class.java)
+    if (userViewModel.userEmail.value != null) {
+        navController.navigate("myMemberships")
+    }
+
+
     MedlemmaTheme {
         val keyboardController = LocalSoftwareKeyboardController.current
         val errorMessage by viewModel.errorMessage.observeAsState()
@@ -49,11 +59,14 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                 .padding(16.dp)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset(y = (-20).dp), // Move everything up by 30 dp
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val logo: Painter = painterResource(id = R.drawable.medlemmalogo)
+
                 Image(
                     painter = logo,
                     contentDescription = "Medlemma Logo",
@@ -74,6 +87,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(onNext = { keyboardController?.hide() }),
                     shape = CustomShapes.large
+
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -115,9 +129,10 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
-                Button(modifier = Modifier.width(220.dp),
+                Button(
+                    modifier = Modifier.width(220.dp),
                     contentPadding = PaddingValues(vertical = 10.dp, horizontal = 20.dp),
                     onClick = {
                         signInAction(emailState.value, passwordState.value)
@@ -137,10 +152,10 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                         modifier = Modifier.padding(end = 15.dp)
                     ) {
                         Image(painter = painterResource(id = R.drawable.icons8_google),
-                            contentDescription = "",
+                            contentDescription = "LoginGoogle",
                             modifier = Modifier.size(24.dp))
                         Text("Login with Google",
-                            modifier = Modifier.padding(start = 5.dp)
+                            modifier = Modifier.padding(start = 5.dp),
                         )
                     }
                 }
@@ -155,7 +170,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "", modifier = Modifier.size(24.dp))
+                        Image(painter = painterResource(id = R.drawable.ic_facebook), contentDescription = "LoginFacebook", modifier = Modifier.size(24.dp))
                         Text("Login with Facebook", modifier = Modifier.padding(start = 5.dp))
                     }
                 }
@@ -198,7 +213,7 @@ fun SignInScreen(navController: NavController, viewModel: SigninViewModel, signI
                         modifier = Modifier
                             .align(Alignment.Center)
                             .padding(8.dp)
-                            .padding(top = 40.dp)
+                            .padding(top = 180.dp)
                     )
                 }
             }

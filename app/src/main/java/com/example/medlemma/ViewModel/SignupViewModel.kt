@@ -4,11 +4,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.medlemma.Model.generateCustomID
+import com.example.medlemma.View.IconState
 import kotlinx.coroutines.launch
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 
 private val auth: FirebaseAuth = Firebase.auth
@@ -20,6 +23,8 @@ class SignupViewModel : ViewModel() {
     val signupErrorMessage = MutableLiveData<String?>()
 
     fun signUp(navController: NavController, email: String, pass: String, confirmPass: String) {
+        val membershipList = listOf("yy","xx")
+        var newUid = ""
         if(email.isEmpty() || pass.isEmpty() || confirmPass.isEmpty()) {
             signupErrorMessage.value = "All fields are required."
             return
@@ -29,6 +34,26 @@ class SignupViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     signupErrorMessage.value = null // clear any previous errors
                     val user = task.result?.user
+                    generateCustomID{ customID ->
+                        if (customID != null) {
+                            newUid = customID
+                        } else {
+                            println("Failed to retrieve unique ID")
+                        }
+                    }
+
+                    val member = Member(
+                        currentMemberships = membershipList,
+                        email = email,
+                        identificationURL = "",
+                        uid = newUid
+                    )
+
+                    val database = FirebaseDatabase.getInstance()
+                    val membersRef = database.getReference("members")
+                    membersRef.child(newUid).setValue(member)
+
+
                     navController.navigate("myMemberships")
                 } else {
                     val exception = task.exception

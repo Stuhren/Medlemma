@@ -1,3 +1,5 @@
+
+
 package com.example.medlemma.ViewModel
 
 import androidx.compose.runtime.getValue
@@ -15,11 +17,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
-
 private val auth: FirebaseAuth = Firebase.auth
 
 class SigninViewModel : ViewModel() {
-
     // Live stores the error message
     val errorMessage = MutableLiveData<String?>()
 
@@ -30,13 +30,13 @@ class SigninViewModel : ViewModel() {
         }
         // Attempt sign in
         auth.signInWithEmailAndPassword(email, pass)
-            // Sign in successful
             .addOnSuccessListener { userCredential ->
                 errorMessage.value = null // clear any previous errors
-                // Signed in
-                val user = userCredential.user
-                navController.navigate("myMemberships?email=$email")
-                // ...
+                // Navigate to myMemberships after successful login
+                navController.navigate("myMemberships") {
+                    // Clears the navigation stack to prevent going back to signIn after logging in
+                    popUpTo("signIn") { inclusive = true }
+                }
             }
             // Sign in failed
             .addOnFailureListener { exception ->
