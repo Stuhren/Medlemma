@@ -195,7 +195,7 @@ class MainActivity : ComponentActivity() {
                         composable("signIn") {
                             SignInScreen(navController, signInViewModel) { email, pass ->
                                 signInViewModel.signIn(navController, email, pass)
-                                //userViewModel.saveUserEmail(email)
+                                userViewModel.saveUserEmail(email)
                             }
                         }
                         composable("signUp") {
