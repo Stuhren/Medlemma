@@ -23,11 +23,18 @@ class SigninViewModel : ViewModel() {
     // Live stores the error message
     val errorMessage = MutableLiveData<String?>()
 
-    fun signIn(navController: NavController, email: String, pass: String) {
-        if(email.isEmpty() || pass.isEmpty()) {
-            errorMessage.value = "All fields are required."
+    fun signIn(
+        navController: NavController,
+        email: String,
+        pass: String,
+        onSuccess: () -> Unit,
+        onFailure: (MutableLiveData<String?>) -> Unit
+    ) {
+        if (email.isEmpty() || pass.isEmpty()) {
+            onFailure(errorMessage)
             return
         }
+
         // Attempt sign in
         auth.signInWithEmailAndPassword(email, pass)
             .addOnSuccessListener { userCredential ->
@@ -37,10 +44,11 @@ class SigninViewModel : ViewModel() {
                     // Clears the navigation stack to prevent going back to signIn after logging in
                     popUpTo("signIn") { inclusive = true }
                 }
+                onSuccess()
             }
             // Sign in failed
             .addOnFailureListener { exception ->
-                // Converts the error message to a user friendly message and sets the errorMessage.value to this
+                // Converts the error message to a user-friendly message and passes it to the failure callback
                 when (exception) {
                     is FirebaseAuthException -> {
                         println("SignInError: Error Code -> ${exception.errorCode}")
@@ -49,6 +57,7 @@ class SigninViewModel : ViewModel() {
                             // ... other FirebaseAuthException error codes
                             else -> "An unexpected error occurred. Please try again."
                         }
+                        onFailure(errorMessage)
                     }
                     is FirebaseException -> {
                         println("SignInError: Message -> ${exception.message}")
@@ -57,10 +66,12 @@ class SigninViewModel : ViewModel() {
                             // ... other FirebaseException error messages
                             else -> "An unexpected error occurred. Please try again."
                         }
+                        onFailure(errorMessage)
                     }
                     else -> {
                         println("SignInError: Exception of unknown type -> ${exception::class.java}")
                         errorMessage.value = "An unexpected error occurred. Please try again."
+                        onFailure(errorMessage)
                     }
                 }
             }

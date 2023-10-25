@@ -194,8 +194,17 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController, startDestination = "signIn") {
                         composable("signIn") {
                             SignInScreen(navController, signInViewModel) { email, pass ->
-                                signInViewModel.signIn(navController, email, pass)
-                                userViewModel.saveUserEmail(email)
+                                signInViewModel.signIn(
+                                    navController,
+                                    email,
+                                    pass,
+                                    onSuccess = {
+                                        userViewModel.saveUserEmail(email)
+                                    },
+                                    onFailure = { errorMessage ->
+                                        println("HÄR ÄR ERROR   $errorMessage")
+                                    }
+                                )
                             }
                         }
                         composable("signUp") {
