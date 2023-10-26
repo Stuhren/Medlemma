@@ -1,6 +1,7 @@
 package com.example.medlemma.View
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,8 +22,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewModelScope
+import com.example.medlemma.Model.FirebaseRepository
+import com.example.medlemma.Model.FirebaseRepository.addMembershipToCurrentMemberships
 import com.example.medlemma.ui.theme.DarkGray
 import com.example.medlemma.ui.theme.MedlemmaTheme
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,8 +39,13 @@ fun BrowseMemberships() {
     MedlemmaTheme {
         val viewModel: MyMembershipsViewModel = viewModel()
         val companies by viewModel.fetchAllCompanies().observeAsState(initial = emptyList())
+        val customScope: CoroutineScope = MainScope()
 
         var searchQuery by remember { mutableStateOf("") }
+        var showDialog by remember { mutableStateOf(false) }
+        val id = companies.map { it.id }
+        var selectedId by remember { mutableStateOf(id.firstOrNull()) }
+        val user = FirebaseAuth.getInstance().currentUser // Assume you've authenticated the user
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -39,8 +53,8 @@ fun BrowseMemberships() {
             ) {
                 OutlinedTextField(
                     value = searchQuery,
-                    onValueChange = {searchQuery = it},
-                    label = { Text(text = "Search Memberships")},
+                    onValueChange = { searchQuery = it },
+                    label = { Text(text = "Search Memberships") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -49,39 +63,79 @@ fun BrowseMemberships() {
                 }
 
                 LazyColumn {
-                items(filteredCompanies) { item ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                    ) {
+                    items(filteredCompanies) { item ->
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .clickable {
-                                }
-                                .clip(shape = CustomShapes.medium)
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
                         ) {
-                            Card(
+                            Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .border(
-                                        4.dp,
-                                        DarkGray,
-                                        shape = CustomShapes.medium
-                                    )
+                                    .clickable {
+                                        showDialog = true
+                                        selectedId = item.id
+                                    }
+                                    .clip(shape = CustomShapes.medium)
                             ) {
-                                Image(
-                                    painter = rememberImagePainter(data = item.companyLogo),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
+                                Card(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .height(220.dp)
-                                )
-                            }
+                                        .border(
+                                            4.dp,
+                                            DarkGray,
+                                            shape = CustomShapes.medium
+                                        )
+                                ) {
+                                    Image(
+                                        painter = rememberImagePainter(data = item.companyLogo),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .height(220.dp)
+                                    )
+                                }
                             }
                         }
+                    }
+                }
+            }
+            if (showDialog) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.6f))
+                        .clickable {
+                            showDialog = false // Close the dialog when clicking outside
+                        }
+                )
+                if (showDialog && selectedId != null) {
+                    val item = companies.find { it.id == selectedId }
+                    if (item != null) {
+                        AddDialog(
+                            Category = item.category,
+                            logo = item.companyLogo,
+                            Name = item.companyName,
+                            onAddClicked = {
+                                if (user != null) {
+                                    customScope.launch {
+                                        val success = addMembershipToCurrentMemberships(user.email, item.id)
+                                        if (success.equals(String())) {
+                                            // Handle successful addition
+                                        } else {
+                                            // Handle failure to add
+                                        }
+                                        showDialog = false // Close the dialog
+                                        selectedId = null
+                                    }
+                                }
+                            },
+                            onDismiss = {
+                                showDialog = false // Close the dialog when needed
+                                selectedId = null // Reset the selected item
+                            }
+                        )
                     }
                 }
             }

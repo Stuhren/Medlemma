@@ -122,6 +122,60 @@ object FirebaseRepository {
         })
     }
 
+    suspend fun addMembershipToCurrentMemberships(email: String?, companyId: String): String {
+        val database = FirebaseDatabase.getInstance()
+        val membersRef = database.getReference("members")
+
+        // Query the member with the specified email
+        val query = membersRef.orderByChild("email").equalTo(email)
+
+        return suspendCancellableCoroutine { continuation ->
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        for (dataSnapshot in snapshot.children) {
+                            val memberToUpdateRef = dataSnapshot.ref
+                            val currentMemberships = dataSnapshot.child("currentMemberships")
+
+                            if (currentMemberships.exists()) {
+                                // Check if the membership already exists
+                                if (!currentMemberships.hasChild(companyId)) {
+                                    // Add the new membership using the company ID as the key
+                                    memberToUpdateRef.child("currentMemberships")
+                                        .child(companyId).setValue(companyId)
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                continuation.resume(companyId) // Successfully added the membership to currentMemberships
+                                            } else {
+                                                continuation.resume(null.toString()) // Failed to add the membership
+                                            }
+                                        }
+                                } else {
+                                    continuation.resume(null.toString()) // Membership already exists in currentMemberships
+                                }
+                            } else {
+                                // Create a new currentMemberships array and add the membership
+                                memberToUpdateRef.child("currentMemberships")
+                                    .child(companyId).setValue(companyId)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            continuation.resume(companyId) // Successfully added the membership to currentMemberships
+                                        } else {
+                                            continuation.resume(null.toString()) // Failed to add the membership
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resume(null.toString())
+                }
+            })
+        }
+    }
+
 
     /*
         suspend fun getCategories(): List<String> {
