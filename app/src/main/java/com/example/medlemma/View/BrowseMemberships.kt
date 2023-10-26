@@ -17,7 +17,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.example.medlemma.ViewModel.MyMembershipsViewModel
 import com.example.medlemma.ui.theme.CustomShapes
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -50,9 +49,11 @@ fun BrowseMemberships() {
         var selectedId by remember { mutableStateOf(id.firstOrNull()) }
         val user = FirebaseAuth.getInstance().currentUser // Assume you've authenticated the user
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Create a Column for the search bar
-            Column {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+                // Search bar inside the LazyColumn
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -62,95 +63,88 @@ fun BrowseMemberships() {
                         .padding(16.dp),
                     shape = CustomShapes.medium
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            val filteredCompanies = companies.filter {
+                it.companyName.contains(searchQuery, ignoreCase = true)
             }
 
-
-
-            // Create a LazyColumn for the filtered companies
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 100.dp) // Adjust the top padding to your preference
-            ) {
-
-                items(companies) { item ->
+            items(filteredCompanies) { item ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
+                            .fillMaxSize()
+                            .clickable {
+                                showDialog = true
+                                selectedId = item.id
+                            }
+                            .clip(shape = CustomShapes.medium)
                     ) {
-                        Box(
+                        Card(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clickable {
-                                    showDialog = true
-                                    selectedId = item.id
-                                }
-                                .clip(shape = CustomShapes.medium)
+                                .border(
+                                    4.dp,
+                                    DarkGray,
+                                    shape = CustomShapes.medium
+                                )
                         ) {
-                            Card(
+                            Image(
+                                painter = rememberImagePainter(data = item.companyLogo),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .border(
-                                        4.dp,
-                                        DarkGray,
-                                        shape = CustomShapes.medium
-                                    )
-                            ) {
-                                Image(
-                                    painter = rememberImagePainter(data = item.companyLogo),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .height(220.dp)
-                                )
-                            }
+                                    .height(220.dp)
+                            )
                         }
                     }
                 }
             }
+        }
 
-            // Add the code for the dialog
-            if (showDialog) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.6f))
-                        .clickable {
-                            showDialog = false // Close the dialog when clicking outside
-                        }
-                )
-                if (showDialog && selectedId != null) {
-                    val item = companies.find { it.id == selectedId }
-                    if (item != null) {
-                        // AddDialog composable here (replace with your actual dialog code)
-                        // You can replace the AddDialog with your actual dialog content
-                        AddDialog(
-                            Category = item.category,
-                            logo = item.companyLogo,
-                            Name = item.companyName,
-                            onAddClicked = {
-                                if (user != null) {
-                                    customScope.launch {
-                                        val success = addMembershipToCurrentMemberships(user.email, item.id)
-                                        if (success.equals(String())) {
-                                            // Handle successful addition
-                                        } else {
-                                            // Handle failure to add
-                                        }
-                                        showDialog = false // Close the dialog
-                                        selectedId = null
-                                    }
-                                }
-                            },
-                            onDismiss = {
-                                showDialog = false // Close the dialog when needed
-                                selectedId = null // Reset the selected item
-                            }
-                        )
+        // Dialog code...
+        if (showDialog) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .clickable {
+                        showDialog = false // Close the dialog when clicking outside
                     }
+            )
+            if (showDialog && selectedId != null) {
+                val item = companies.find { it.id == selectedId }
+                if (item != null) {
+                    // AddDialog composable here (replace with your actual dialog code)
+                    // You can replace the AddDialog with your actual dialog content
+                    AddDialog(
+                        Category = item.category,
+                        logo = item.companyLogo,
+                        Name = item.companyName,
+                        onAddClicked = {
+                            if (user != null) {
+                                customScope.launch {
+                                    val success = addMembershipToCurrentMemberships(user.email, item.id)
+                                    if (success.equals(String())) {
+                                        // Handle successful addition
+                                    } else {
+                                        // Handle failure to add
+                                    }
+                                    showDialog = false // Close the dialog
+                                    selectedId = null
+                                }
+                            }
+                        },
+                        onDismiss = {
+                            showDialog = false // Close the dialog when needed
+                            selectedId = null // Reset the selected item
+                        }
+                    )
                 }
             }
         }
