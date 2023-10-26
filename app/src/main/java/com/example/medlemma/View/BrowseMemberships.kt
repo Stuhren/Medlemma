@@ -22,12 +22,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
 import com.example.medlemma.Model.FirebaseRepository
 import com.example.medlemma.Model.FirebaseRepository.addMembershipToCurrentMemberships
 import com.example.medlemma.ui.theme.DarkGray
 import com.example.medlemma.ui.theme.MedlemmaTheme
+import com.example.medlemma.ui.theme.SoftGray
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -48,59 +51,68 @@ fun BrowseMemberships() {
         val user = FirebaseAuth.getInstance().currentUser // Assume you've authenticated the user
 
         Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            // Create a Column for the search bar
+            Column {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     label = { Text(text = "Search Memberships") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = CustomShapes.medium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                val filteredCompanies = companies.filter {
-                    it.companyName.contains(searchQuery, ignoreCase = true)
-                }
+            }
 
-                LazyColumn {
-                    items(filteredCompanies) { item ->
+
+
+            // Create a LazyColumn for the filtered companies
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 100.dp) // Adjust the top padding to your preference
+            ) {
+
+                items(companies) { item ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp)
+                                .fillMaxSize()
+                                .clickable {
+                                    showDialog = true
+                                    selectedId = item.id
+                                }
+                                .clip(shape = CustomShapes.medium)
                         ) {
-                            Box(
+                            Card(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .clickable {
-                                        showDialog = true
-                                        selectedId = item.id
-                                    }
-                                    .clip(shape = CustomShapes.medium)
+                                    .border(
+                                        4.dp,
+                                        DarkGray,
+                                        shape = CustomShapes.medium
+                                    )
                             ) {
-                                Card(
+                                Image(
+                                    painter = rememberImagePainter(data = item.companyLogo),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .border(
-                                            4.dp,
-                                            DarkGray,
-                                            shape = CustomShapes.medium
-                                        )
-                                ) {
-                                    Image(
-                                        painter = rememberImagePainter(data = item.companyLogo),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .height(220.dp)
-                                    )
-                                }
+                                        .height(220.dp)
+                                )
                             }
                         }
                     }
                 }
             }
+
+            // Add the code for the dialog
             if (showDialog) {
                 Box(
                     modifier = Modifier
@@ -113,6 +125,8 @@ fun BrowseMemberships() {
                 if (showDialog && selectedId != null) {
                     val item = companies.find { it.id == selectedId }
                     if (item != null) {
+                        // AddDialog composable here (replace with your actual dialog code)
+                        // You can replace the AddDialog with your actual dialog content
                         AddDialog(
                             Category = item.category,
                             logo = item.companyLogo,

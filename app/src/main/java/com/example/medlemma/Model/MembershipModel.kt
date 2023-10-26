@@ -138,25 +138,27 @@ object FirebaseRepository {
                             val currentMemberships = dataSnapshot.child("currentMemberships")
 
                             if (currentMemberships.exists()) {
-                                // Check if the membership already exists
-                                if (!currentMemberships.hasChild(companyId)) {
-                                    // Add the new membership using the company ID as the key
-                                    memberToUpdateRef.child("currentMemberships")
-                                        .child(companyId).setValue(companyId)
-                                        .addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
-                                                continuation.resume(companyId) // Successfully added the membership to currentMemberships
-                                            } else {
-                                                continuation.resume(null.toString()) // Failed to add the membership
-                                            }
-                                        }
-                                } else {
-                                    continuation.resume(null.toString()) // Membership already exists in currentMemberships
-                                }
-                            } else {
-                                // Create a new currentMemberships array and add the membership
+                                // Find the maximum index in the currentMemberships array
+                                val maxIndex = currentMemberships.children
+                                    .map { it.key?.toIntOrNull() ?: 0 }
+                                    .maxOrNull() ?: -1
+
+                                val newIndex = maxIndex + 1
+
+                                // Add the new membership using the newIndex as the key
                                 memberToUpdateRef.child("currentMemberships")
-                                    .child(companyId).setValue(companyId)
+                                    .child(newIndex.toString()).setValue(companyId)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            continuation.resume(companyId) // Successfully added the membership to currentMemberships
+                                        } else {
+                                            continuation.resume(null.toString()) // Failed to add the membership
+                                        }
+                                    }
+                            } else {
+                                // Create a new currentMemberships array and add the membership at index 0
+                                memberToUpdateRef.child("currentMemberships")
+                                    .child("0").setValue(companyId)
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
                                             continuation.resume(companyId) // Successfully added the membership to currentMemberships

@@ -59,6 +59,11 @@ fun MyMemberships(email: String?) {
         var selectedId by remember { mutableStateOf(id.firstOrNull()) }
         var QrCode = members.map { it.identificationURL }
 
+        println("COMPANIES:  $companies")
+        println("INFO: $userCompanies")
+        println("MEMBERSHIPS: $currentMemberships")
+        println("Selected Category: $selectedCategory")
+
         var filteredCompanies = remember { mutableStateOf(userCompanies) }
 
         DisposableEffect(selectedCategory) {
@@ -185,9 +190,12 @@ fun MyMemberships(email: String?) {
                         onRemoveClick = {
                             removeMembershipFromCurrentMemberships(email, item.id) { success ->
                                 if (success) {
-                                    selectedCategory = "Alla"
+                                    if (selectedCategory == "Category") {
+                                        selectedCategory = "Alla"
+                                    } else {
+                                        selectedCategory = "Category"
+                                    }
                                 } else {
-
                                 }
                             }
                             showDialog = false

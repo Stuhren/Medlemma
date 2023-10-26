@@ -224,6 +224,7 @@ class MainActivity : ComponentActivity() {
                         composable("myMemberships") {
                             protectRoute(navController) { user ->
                                 MyMemberships(user)
+                                println("HÄR ÄR EMAIL CHECK: ${userViewModel.userEmail.value}")
                             }
                         }
                         composable("signOut") {
